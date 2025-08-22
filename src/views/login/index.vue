@@ -324,13 +324,13 @@ onBeforeUnmount(() => {
     <!--  底部  -->
     <div class="flex items-center justify-center h-full">
       <div class="flex flex-col items-center justify-center mb-3">
-        <span>Copyright © 2018-2023 Agileboot All Rights Reserved. </span>
+        <span>版权所有© 深圳崖山科技有限公司</span>
         <el-link
           href="https://beian.miit.gov.cn"
           rel="external nofollow"
           target="_blank"
           type="primary"
-          >闽ICP备2022018106号-2
+          >粤ICP备2022018810号
         </el-link>
       </div>
     </div>
