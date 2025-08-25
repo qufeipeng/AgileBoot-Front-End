@@ -2,19 +2,19 @@
 import VDialog from "@/components/VDialog/VDialog.vue";
 import { computed, reactive, ref } from "vue";
 import {
-  AddPostCommand,
-  PostPageResponse,
-  UpdatePostCommand,
-  addPostApi,
-  updatePostApi
-} from "@/api/system/post";
+  AddPocCommand,
+  PocPageResponse,
+  UpdatePocCommand,
+  addPocApi,
+  updatePocApi
+} from "@/api/poc";
 import { useUserStoreHook } from "@/store/modules/user";
 import { ElMessage, FormInstance, FormRules } from "element-plus";
 
 interface Props {
   type: "add" | "update";
   modelValue: boolean;
-  row?: PostPageResponse;
+  row?: PocPageResponse;
 }
 
 const props = defineProps<Props>();
@@ -30,34 +30,55 @@ const visible = computed({
   }
 });
 
-const formData = reactive<AddPostCommand | UpdatePostCommand>({
-  postId: 0,
-  postCode: "",
-  postName: "",
-  postSort: 1,
-  remark: "",
-  status: ""
+const formData = reactive<AddPocCommand | UpdatePocCommand>({
+  owner: "",
+  status: "",
+  customer: "",
+  project: "",
+  progress: 0,
+  risk: "",
+  todo_risk: "",
+  done: "",
+  sales: "",
+  sa: "",
+  poc: "",
+  op: "",
+  kv: "",
+  pocStartDt: null,
+  pocEndDt: null,
+  onlineDt: null,
+  lastUpdDt: null,
+  province: "",
+  industry: "",
+  isv: "",
+  maintenance: "",
+  version: "",
+  deployment: "",
+  compatibility: "",
+  plugins: "",
+  notes: "",
+  deptId: 0
 });
 
 const statusList = useUserStoreHook().dictionaryMap["common.status"];
 
 const rules: FormRules = {
-  postName: [
+  owner: [
     {
       required: true,
-      message: "岗位名称不能为空"
+      message: "当前责任人不能为空"
     }
   ],
-  postCode: [
+  customer: [
     {
       required: true,
-      message: "岗位编码不能为空"
+      message: "客户名称不能为空"
     }
   ],
-  postSort: [
+  project: [
     {
       required: true,
-      message: "岗位序号不能为空"
+      message: "项目名称不能为空"
     }
   ]
 };
@@ -75,9 +96,9 @@ async function handleConfirm() {
   try {
     loading.value = true;
     if (props.type === "add") {
-      await addPostApi(formData);
+      await addPocApi(formData);
     } else if (props.type === "update") {
-      await updatePostApi(formData as UpdatePostCommand);
+      await updatePocApi(formData as UpdatePocCommand);
     }
     ElMessage.info("提交成功");
     visible.value = false;
@@ -96,7 +117,7 @@ async function handleConfirm() {
     show-full-screen
     :fixed-body-height="false"
     use-body-scrolling
-    :title="type === 'add' ? '新增岗位' : '更新岗位'"
+    :title="type === 'add' ? '新增POC' : '更新POC'"
     v-model="visible"
     :loading="loading"
     @confirm="handleConfirm"
@@ -104,16 +125,19 @@ async function handleConfirm() {
     @opened="handleOpened"
   >
     <el-form :model="formData" label-width="120px" :rules="rules" ref="formRef">
-      <el-form-item prop="postName" label="岗位名称" required inline-message>
-        <el-input v-model="formData.postName" />
+      <el-form-item prop="owner" label="当前责任人" required inline-message>
+        <el-input v-model="formData.owner" />
       </el-form-item>
-      <el-form-item prop="postCode" label="岗位编码" required>
-        <el-input v-model="formData.postCode" />
+      <el-form-item prop="customer" label="客户名称" required>
+        <el-input v-model="formData.customer" />
       </el-form-item>
-      <el-form-item prop="postSort" label="岗位顺序" required>
-        <el-input-number :min="1" v-model="formData.postSort" />
+      <el-form-item prop="project" label="项目名称" required>
+        <el-input v-model="formData.project" />
       </el-form-item>
-      <el-form-item prop="status" label="岗位状态">
+      <el-form-item prop="progress" label="进度" required>
+        <el-input-number :min="1" v-model="formData.progress" />
+      </el-form-item>
+      <el-form-item prop="status" label="状态">
         <el-radio-group v-model="formData.status">
           <el-radio
             v-for="item in Object.keys(statusList)"
@@ -123,8 +147,8 @@ async function handleConfirm() {
           >
         </el-radio-group>
       </el-form-item>
-      <el-form-item prop="remark" label="备注" style="margin-bottom: 0">
-        <el-input type="textarea" v-model="formData.remark" />
+      <el-form-item prop="notes" label="备注" style="margin-bottom: 0">
+        <el-input type="textarea" v-model="formData.notes" />
       </el-form-item>
     </el-form>
   </v-dialog>

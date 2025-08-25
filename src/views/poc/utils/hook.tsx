@@ -2,21 +2,18 @@ import dayjs from "dayjs";
 import { message } from "@/utils/message";
 import { ElMessageBox, Sort } from "element-plus";
 import { reactive, ref, onMounted, toRaw, computed } from "vue";
-import { useUserStoreHook } from "@/store/modules/user";
 import { CommonUtils } from "@/utils/common";
 import { PaginationProps } from "@pureadmin/table";
 import {
-  PostListCommand,
-  getPostListApi,
-  exportPostExcelApi,
-  deletePostApi
-} from "@/api/system/post";
+  PocListCommand,
+  getPocListApi,
+  exportPocExcelApi,
+  deletePocApi
+} from "@/api/poc";
 
-const statusMap = useUserStoreHook().dictionaryMap["common.status"];
-
-export function usePostHook() {
+export function usePocHook() {
   const defaultSort: Sort = {
-    prop: "postSort",
+    prop: "createTime",
     order: "ascending"
   };
 
@@ -46,10 +43,12 @@ export function usePostHook() {
     }
   });
 
-  const searchFormParams = reactive<PostListCommand>({
-    postCode: "",
-    postName: "",
-    status: undefined
+  const searchFormParams = reactive<PocListCommand>({
+    customer: "",
+    project: "",
+    status: "",
+    owner: "",
+    risk: ""
   });
 
   const dataList = ref([]);
@@ -63,39 +62,157 @@ export function usePostHook() {
       align: "left"
     },
     {
-      label: "岗位编号",
-      prop: "postId",
+      label: "POC编号",
+      prop: "pocId",
       minWidth: 100
     },
     {
-      label: "岗位编码",
-      prop: "postCode",
+      label: "部门名称",
+      prop: "deptName",
       minWidth: 120
     },
     {
-      label: "岗位名称",
-      prop: "postName",
-      minWidth: 120
-    },
-    {
-      label: "岗位排序",
-      prop: "postSort",
-      sortable: "custom",
+      label: "当前责任人",
+      prop: "owner",
       minWidth: 120
     },
     {
       label: "状态",
       prop: "status",
+      minWidth: 120
+    },
+    {
+      label: "客户名称",
+      prop: "customer",
+      minWidth: 120
+    },
+    {
+      label: "项目名称",
+      prop: "project",
+      minWidth: 120
+    },
+    {
+      label: "进度",
+      prop: "progress",
+      minWidth: 100
+    },
+    {
+      label: "风险",
+      prop: "risk",
+      minWidth: 120
+    },
+    {
+      label: "待处理&风险描述",
+      prop: "todo_risk",
+      minWidth: 120
+    },
+    {
+      label: "已完成进展",
+      prop: "done",
+      minWidth: 120
+    },
+    {
+      label: "销售",
+      prop: "sales",
+      minWidth: 120
+    },
+    {
+      label: "售前",
+      prop: "sa",
+      minWidth: 120
+    },
+    {
+      label: "poc人员",
+      prop: "poc",
+      minWidth: 120
+    },
+    {
+      label: "运维",
+      prop: "op",
+      minWidth: 120
+    },
+    {
+      label: "重点项目",
+      prop: "kv",
+      minWidth: 120
+    },
+    {
+      label: "开始日期",
       minWidth: 120,
-      cellRenderer: ({ row, props }) => (
-        <el-tag
-          size={props.size}
-          type={statusMap[row.status].cssTag}
-          effect="plain"
-        >
-          {statusMap[row.status].label}
-        </el-tag>
-      )
+      prop: "pocStartDt",
+      sortable: "custom",
+      formatter: ({ pocStartDt }) => dayjs(pocStartDt).format("YYYY-MM-DD")
+    },
+    {
+      label: "POC完成日期",
+      minWidth: 120,
+      prop: "pocEndDt",
+      sortable: "custom",
+      formatter: ({ pocEndDt }) => dayjs(pocEndDt).format("YYYY-MM-DD")
+    },
+    {
+      label: "上线日期",
+      minWidth: 120,
+      prop: "onlineDt",
+      sortable: "custom",
+      formatter: ({ onlineDt }) => dayjs(onlineDt).format("YYYY-MM-DD")
+    },
+    {
+      label: "最后更新日期",
+      minWidth: 120,
+      prop: "lastUpdDt",
+      sortable: "custom",
+      formatter: ({ lastUpdDt }) => dayjs(lastUpdDt).format("YYYY-MM-DD")
+    },
+    {
+      label: "省份",
+      prop: "province",
+      minWidth: 120
+    },
+    {
+      label: "行业",
+      prop: "industry",
+      minWidth: 120
+    },
+    {
+      label: "ISV",
+      prop: "isv",
+      minWidth: 120
+    },
+    {
+      label: "运维厂商",
+      prop: "maintenance",
+      minWidth: 120
+    },
+    {
+      label: "版本号",
+      prop: "version",
+      minWidth: 120
+    },
+    {
+      label: "部署形态",
+      prop: "deployment",
+      minWidth: 120
+    },
+    {
+      label: "兼容性需求",
+      prop: "compatibility",
+      minWidth: 120
+    },
+    {
+      label: "相关组件",
+      prop: "plugins",
+      minWidth: 120
+    },
+    {
+      label: "备注",
+      prop: "notes",
+      minWidth: 120
+    },
+    {
+      label: "创建者",
+      prop: "creatorName",
+      minWidth: 120
     },
     {
       label: "创建时间",
@@ -104,6 +221,19 @@ export function usePostHook() {
       sortable: "custom",
       formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+    },
+    {
+      label: "更新者",
+      prop: "updaterName",
+      minWidth: 120
+    },
+    {
+      label: "更新时间",
+      minWidth: 160,
+      prop: "updateTime",
+      sortable: "custom",
+      formatter: ({ updateTime }) =>
+        dayjs(updateTime).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "操作",
@@ -117,12 +247,12 @@ export function usePostHook() {
     sortState.value = sort;
     // 表格列的排序变化的时候，需要重置分页
     pagination.currentPage = 1;
-    getPostList();
+    getPocList();
   }
 
   async function onSearch(tableRef) {
     // 点击搜索的时候，需要重置排序，重新排序的时候会重置分页并发起查询请求
-    tableRef.getTableRef().sort("postSort", "ascending");
+    tableRef.getTableRef().sort("createTime", "ascending");
   }
 
   function resetForm(formEl, tableRef) {
@@ -137,12 +267,12 @@ export function usePostHook() {
     onSearch(tableRef);
   }
 
-  async function getPostList() {
+  async function getPocList() {
     pageLoading.value = true;
     CommonUtils.fillSortParams(searchFormParams, sortState.value);
     CommonUtils.fillPaginationParams(searchFormParams, pagination);
 
-    const { data } = await getPostListApi(toRaw(searchFormParams)).finally(
+    const { data } = await getPocListApi(toRaw(searchFormParams)).finally(
       () => {
         pageLoading.value = false;
       }
@@ -158,16 +288,16 @@ export function usePostHook() {
     CommonUtils.fillPaginationParams(searchFormParams, pagination);
     CommonUtils.fillTimeRangeParams(searchFormParams, timeRange.value);
 
-    exportPostExcelApi(toRaw(searchFormParams), "岗位数据.xlsx");
+    exportPocExcelApi(toRaw(searchFormParams), "POC数据.xlsx");
   }
 
   async function handleDelete(row) {
-    await deletePostApi([row.postId]).then(() => {
-      message(`您删除了编号为${row.postId}的这条岗位数据`, {
+    await deletePocApi([row.postId]).then(() => {
+      message(`您删除了编号为${row.pocId}的这条POC数据`, {
         type: "success"
       });
       // 刷新列表
-      getPostList();
+      getPocList();
     });
   }
 
@@ -178,7 +308,7 @@ export function usePostHook() {
     }
 
     ElMessageBox.confirm(
-      `确认要<strong>删除</strong>编号为<strong style='color:var(--el-color-primary)'>[ ${multipleSelection.value} ]</strong>的岗位数据吗?`,
+      `确认要<strong>删除</strong>编号为<strong style='color:var(--el-color-primary)'>[ ${multipleSelection.value} ]</strong>的POC数据吗?`,
       "系统提示",
       {
         confirmButtonText: "确定",
@@ -189,12 +319,12 @@ export function usePostHook() {
       }
     )
       .then(async () => {
-        await deletePostApi(multipleSelection.value).then(() => {
-          message(`您删除了编号为[ ${multipleSelection.value} ]的岗位数据`, {
+        await deletePocApi(multipleSelection.value).then(() => {
+          message(`您删除了编号为[ ${multipleSelection.value} ]的POC数据`, {
             type: "success"
           });
           // 刷新列表
-          getPostList();
+          getPocList();
         });
       })
       .catch(() => {
@@ -206,7 +336,7 @@ export function usePostHook() {
       });
   }
 
-  onMounted(getPostList);
+  onMounted(getPocList);
 
   return {
     searchFormParams,
@@ -221,7 +351,7 @@ export function usePostHook() {
     onSortChanged,
     exportAllExcel,
     // exportExcel,
-    getPostList,
+    getPocList,
     resetForm,
     handleDelete,
     handleBulkDelete
