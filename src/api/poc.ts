@@ -108,8 +108,8 @@ export interface UpdatePocCommand extends AddPocCommand {
   pocId: number;
 }
 
-export const updatePocApi = (data: UpdatePocCommand) => {
-  return http.request<ResponseData<void>>("put", "/poc", {
+export const updatePocApi = (pocId: number, data?: UpdatePocCommand) => {
+  return http.request<ResponseData<void>>("put", `/poc/${pocId}`, {
     data
   });
 };

@@ -1,60 +1,112 @@
 import dayjs from "dayjs";
 import { message } from "@/utils/message";
-import { ElMessageBox, Sort } from "element-plus";
-import { reactive, ref, onMounted, toRaw, computed } from "vue";
+import editForm from "../poc-form-modal.vue";
+import { type PaginationProps } from "@pureadmin/table";
+import { reactive, ref, onMounted, toRaw, h } from "vue";
 import { CommonUtils } from "@/utils/common";
-import { PaginationProps } from "@pureadmin/table";
+import { addDialog } from "@/components/ReDialog";
+import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
+import { getDeptListApi } from "@/api/system/dept";
 import {
   PocListCommand,
   getPocListApi,
   exportPocExcelApi,
-  deletePocApi
+  deletePocApi,
+  addPocApi,
+  updatePocApi,
+  UpdatePocCommand
 } from "@/api/poc";
+import { useUserStoreHook } from "@/store/modules/user";
 
-export function usePocHook() {
-  const defaultSort: Sort = {
-    prop: "createTime",
-    order: "ascending"
-  };
+export function useHook() {
+  const searchFormParams = reactive<PocListCommand>({
+    customer: undefined,
+    project: undefined,
+    status: undefined,
+    owner: undefined,
+    risk: undefined,
+    timeRangeColumn: "createTime"
+  });
 
-  const pagination: PaginationProps = {
+  const formRef = ref();
+  const timeRange = ref<[string, string]>();
+
+  const dataList = ref([]);
+  const pageLoading = ref(true);
+  const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true
-  };
+  });
 
-  const timeRange = computed<[string, string] | null>({
-    get() {
-      if (searchFormParams.beginTime && searchFormParams.endTime) {
-        return [searchFormParams.beginTime, searchFormParams.endTime];
-      } else {
-        return null;
-      }
+  const deptTreeList = ref([]);
+
+  const status = [
+    {
+      value: "0",
+      label: "待启动"
     },
-    set(v) {
-      if (v?.length === 2) {
-        searchFormParams.beginTime = v[0];
-        searchFormParams.endTime = v[1];
-      } else {
-        searchFormParams.beginTime = undefined;
-        searchFormParams.endTime = undefined;
-      }
+    {
+      value: "1",
+      label: "POC中"
+    },
+    {
+      value: "2",
+      label: "POC暂停"
+    },
+    {
+      value: "3",
+      label: "POC完成-待推进"
+    },
+    {
+      value: "4",
+      label: "POC完成-取消"
+    },
+    {
+      value: "5",
+      label: "上线实施中"
+    },
+    {
+      value: "6",
+      label: "已上线"
+    },
+    {
+      value: "7",
+      label: "转维护"
+    },
+    {
+      value: "8",
+      label: "生态适配中"
+    },
+    {
+      value: "9",
+      label: "生态适配完成"
+    },
+    {
+      value: "10",
+      label: "取消"
+    },
+    {
+      value: "11",
+      label: "其他"
     }
-  });
+  ];
 
-  const searchFormParams = reactive<PocListCommand>({
-    customer: "",
-    project: "",
-    status: "",
-    owner: "",
-    risk: ""
-  });
-
-  const dataList = ref([]);
-  const pageLoading = ref(true);
-  const multipleSelection = ref([]);
-  const sortState = ref<Sort>(defaultSort);
+  const risks = [
+    {
+      value: "0",
+      label: "无风险"
+    },
+    {
+      value: "1",
+      label: "低风险"
+    },
+    {
+      value: "2",
+      label: "高风险"
+    }
+  ];
 
   const columns: TableColumnList = [
     {
@@ -67,7 +119,7 @@ export function usePocHook() {
       minWidth: 100
     },
     {
-      label: "部门名称",
+      label: "项目组",
       prop: "deptName",
       minWidth: 120
     },
@@ -79,7 +131,8 @@ export function usePocHook() {
     {
       label: "状态",
       prop: "status",
-      minWidth: 120
+      minWidth: 120,
+      cellRenderer: ({ row }) => status[row.status].label
     },
     {
       label: "客户名称",
@@ -99,7 +152,8 @@ export function usePocHook() {
     {
       label: "风险",
       prop: "risk",
-      minWidth: 120
+      minWidth: 120,
+      cellRenderer: ({ row }) => risks[row.risk].label
     },
     {
       label: "待处理&风险描述",
@@ -243,100 +297,141 @@ export function usePocHook() {
     }
   ];
 
-  function onSortChanged(sort: Sort) {
-    sortState.value = sort;
-    // 表格列的排序变化的时候，需要重置分页
-    pagination.currentPage = 1;
-    getPocList();
-  }
-
-  async function onSearch(tableRef) {
-    // 点击搜索的时候，需要重置排序，重新排序的时候会重置分页并发起查询请求
-    tableRef.getTableRef().sort("createTime", "ascending");
-  }
-
-  function resetForm(formEl, tableRef) {
-    if (!formEl) return;
-    // 清空查询参数
-    formEl.resetFields();
-    // 清空时间查询  TODO  这块有点繁琐  有可以优化的地方吗？
-    // Form组件的resetFields方法无法清除datepicker里面的数据。
-    searchFormParams.beginTime = undefined;
-    searchFormParams.endTime = undefined;
-    // 重置分页并查询
-    onSearch(tableRef);
-  }
-
-  async function getPocList() {
-    pageLoading.value = true;
-    CommonUtils.fillSortParams(searchFormParams, sortState.value);
+  async function exportAllExcel() {
     CommonUtils.fillPaginationParams(searchFormParams, pagination);
+    exportPocExcelApi(toRaw(searchFormParams), "POC列表.xls");
+  }
 
+  async function handleAdd(row, done) {
+    await addPocApi(row as UpdatePocCommand).then(() => {
+      message(`您新增了POC${row.project}的这条数据`, {
+        type: "success"
+      });
+      // 关闭弹框
+      done();
+      // 刷新列表
+      getList();
+    });
+  }
+
+  async function handleUpdate(row, done) {
+    await updatePocApi(row.pocId, row as UpdatePocCommand).then(() => {
+      message(`您修改了POC${row.project}的这条数据`, {
+        type: "success"
+      });
+      // 关闭弹框
+      done();
+      // 刷新列表
+      getList();
+    });
+  }
+
+  async function handleDelete(row) {
+    await deletePocApi(row.pocId).then(() => {
+      message(`您删除了POC${row.project}的这条数据`, { type: "success" });
+      // 刷新列表
+      getList();
+    });
+  }
+
+  async function onSearch() {
+    // 点击搜索的时候 需要重置分页
+    pagination.currentPage = 1;
+    getList();
+  }
+
+  async function openDialog(title = "新增", row?: UpdatePocCommand) {
+    // TODO 如果是编辑的话  通过获取POC详情接口来获取数据
+    addDialog({
+      title: `${title}POC`,
+      props: {
+        formInline: {
+          pocId: row?.pocId ?? 0,
+          owner: row?.owner ?? useUserStoreHook().username,
+          status: row?.status ?? "",
+          customer: row?.customer ?? "",
+          project: row?.project ?? "",
+          progress: row?.progress ?? 0,
+          risk: row?.risk ?? "",
+          todo_risk: row?.todo_risk ?? "",
+          done: row?.done ?? "",
+          sales: row?.sales ?? "",
+          sa: row?.sa ?? "",
+          poc: row?.poc ?? "",
+          op: row?.op ?? "",
+          kv: row?.kv ?? "",
+          pocStartDt: row?.pocStartDt ?? undefined,
+          pocEndDt: row?.pocEndDt ?? undefined,
+          onlineDt: row?.onlineDt ?? undefined,
+          lastUpdDt: row?.lastUpdDt ?? undefined,
+          province: row?.province ?? "",
+          industry: row?.industry ?? "",
+          isv: row?.isv ?? "",
+          maintenance: row?.maintenance ?? "",
+          version: row?.version ?? "",
+          deployment: row?.deployment ?? "",
+          compatibility: row?.compatibility ?? "",
+          plugins: row?.plugins ?? "",
+          notes: row?.notes ?? "",
+          deptId: row?.deptId ?? useUserStoreHook().deptId
+        },
+        deptOptions: deptTreeList,
+        statusOptions: status,
+        riskOptions: risks
+      },
+
+      width: "60%",
+      draggable: true,
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      contentRenderer: () => h(editForm, { ref: formRef }),
+      beforeSure: (done, { options }) => {
+        const formRuleRef = formRef.value.getFormRuleRef();
+        const curData = options.props.formInline as UpdatePocCommand;
+
+        formRuleRef.validate(valid => {
+          if (valid) {
+            // 表单规则校验通过
+            if (title === "新增") {
+              handleAdd(curData, done);
+            } else {
+              handleUpdate(curData, done);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  async function getList() {
+    CommonUtils.fillPaginationParams(searchFormParams, pagination);
+    CommonUtils.fillTimeRangeParams(searchFormParams, timeRange.value);
+
+    pageLoading.value = true;
     const { data } = await getPocListApi(toRaw(searchFormParams)).finally(
       () => {
         pageLoading.value = false;
       }
     );
+
     dataList.value = data.rows;
     pagination.total = data.total;
   }
 
-  async function exportAllExcel() {
-    if (sortState.value != null) {
-      CommonUtils.fillSortParams(searchFormParams, sortState.value);
-    }
-    CommonUtils.fillPaginationParams(searchFormParams, pagination);
-    CommonUtils.fillTimeRangeParams(searchFormParams, timeRange.value);
+  const resetForm = formEl => {
+    if (!formEl) return;
+    formEl.resetFields();
+    onSearch();
+  };
 
-    exportPocExcelApi(toRaw(searchFormParams), "POC数据.xlsx");
-  }
-
-  async function handleDelete(row) {
-    await deletePocApi([row.postId]).then(() => {
-      message(`您删除了编号为${row.pocId}的这条POC数据`, {
-        type: "success"
-      });
-      // 刷新列表
-      getPocList();
-    });
-  }
-
-  async function handleBulkDelete(tableRef) {
-    if (multipleSelection.value.length === 0) {
-      message("请选择需要删除的数据", { type: "warning" });
-      return;
-    }
-
-    ElMessageBox.confirm(
-      `确认要<strong>删除</strong>编号为<strong style='color:var(--el-color-primary)'>[ ${multipleSelection.value} ]</strong>的POC数据吗?`,
-      "系统提示",
-      {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        dangerouslyUseHTMLString: true,
-        draggable: true
-      }
-    )
-      .then(async () => {
-        await deletePocApi(multipleSelection.value).then(() => {
-          message(`您删除了编号为[ ${multipleSelection.value} ]的POC数据`, {
-            type: "success"
-          });
-          // 刷新列表
-          getPocList();
-        });
-      })
-      .catch(() => {
-        message("取消删除", {
-          type: "info"
-        });
-        // 清空checkbox选择的数据
-        tableRef.getTableRef().clearSelection();
-      });
-  }
-
-  onMounted(getPocList);
+  onMounted(async () => {
+    onSearch();
+    const deptResponse = await getDeptListApi();
+    deptTreeList.value = await setDisabledForTreeOptions(
+      handleTree(deptResponse.data),
+      "status"
+    );
+  });
 
   return {
     searchFormParams,
@@ -344,16 +439,14 @@ export function usePocHook() {
     columns,
     dataList,
     pagination,
-    defaultSort,
-    timeRange,
-    multipleSelection,
     onSearch,
-    onSortChanged,
+    openDialog,
     exportAllExcel,
-    // exportExcel,
-    getPocList,
     resetForm,
+    handleUpdate,
+    getList,
     handleDelete,
-    handleBulkDelete
+    status,
+    risks
   };
 }

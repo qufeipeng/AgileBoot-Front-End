@@ -41,6 +41,7 @@ export function setTokenFromBackend(data: TokenDTO): void {
   Cookies.set(tokenKey, cookieString);
 
   useUserStoreHook().SET_USERNAME(data.currentUser.userInfo.username);
+  useUserStoreHook().SET_DEPT_ID(data.currentUser.userInfo.deptId);
   useUserStoreHook().SET_ROLES([data.currentUser.roleKey]);
   storageSession().setItem(sessionKey, data);
 }

@@ -19,6 +19,10 @@ export const useUserStore = defineStore({
     username:
       storageSession().getItem<TokenDTO>(sessionKey)?.currentUser.userInfo
         .username ?? "",
+    // 部门ID
+    deptId:
+      storageSession().getItem<TokenDTO>(sessionKey)?.currentUser.userInfo
+        .deptId ?? 0,
     // 页面级别权限
     roles: storageSession().getItem<TokenDTO>(sessionKey)?.currentUser.roleKey
       ? [storageSession().getItem<TokenDTO>(sessionKey)?.currentUser.roleKey]
@@ -39,6 +43,11 @@ export const useUserStore = defineStore({
     SET_USERNAME(username: string) {
       /** TODO 这里不是应该再进一步存到sessionStorage中吗 */
       this.username = username;
+    },
+    /** 存储部门ID */
+    SET_DEPT_ID(deptId: number) {
+      /** TODO 这里不是应该再进一步存到sessionStorage中吗 */
+      this.deptId = deptId;
     },
     /** 存储角色 */
     SET_ROLES(roles: Array<string>) {
@@ -74,6 +83,7 @@ export const useUserStore = defineStore({
     /** 前端登出（不调用接口） */
     logOut() {
       this.username = "";
+      this.deptId = 0;
       this.roles = [];
       removeToken();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
