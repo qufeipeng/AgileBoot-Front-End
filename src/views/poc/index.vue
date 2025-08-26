@@ -1,126 +1,49 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { usePocHook } from "./utils/hook";
+import { ref, watch } from "vue";
+import { useHook } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
 import Delete from "@iconify-icons/ep/delete";
+import EditPen from "@iconify-icons/ep/edit-pen";
+import Download from "@iconify-icons/ep/download";
 import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
-// TODO 这个导入声明好长  看看如何优化
-import { CommonUtils } from "@/utils/common";
-import PocFormModal from "@/views/poc/poc-form-modal.vue";
-import EditPen from "@iconify-icons/ep/edit-pen";
-import { PocPageResponse } from "@/api/poc";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 
-/** 组件name最好和菜单表中的router_name一致 */
 defineOptions({
   name: "Poc"
 });
 
-const status = [
-  {
-    value: "待启动",
-    label: "待启动"
-  },
-  {
-    value: "POC中",
-    label: "POC中"
-  },
-  {
-    value: "POC暂停",
-    label: "POC暂停"
-  },
-  {
-    value: "POC完成-待推进",
-    label: "POC完成-待推进"
-  },
-  {
-    value: "POC完成-取消",
-    label: "POC完成-取消"
-  },
-  {
-    value: "上线实施中",
-    label: "上线实施中"
-  },
-  {
-    value: "已上线",
-    label: "已上线"
-  },
-  {
-    value: "转维护",
-    label: "转维护"
-  },
-  {
-    value: "生态适配中",
-    label: "生态适配中"
-  },
-  {
-    value: "生态适配完成",
-    label: "生态适配完成"
-  },
-  {
-    value: "取消",
-    label: "取消"
-  },
-  {
-    value: "其他",
-    label: "其他"
-  }
-];
-
-const risks = [
-  {
-    value: "无风险",
-    label: "无风险"
-  },
-  {
-    value: "低风险",
-    label: "低风险"
-  },
-  {
-    value: "高风险",
-    label: "高风险"
-  }
-];
-
-const tableRef = ref();
-
-const searchFormRef = ref();
+const formRef = ref();
 const {
   searchFormParams,
   pageLoading,
   columns,
   dataList,
   pagination,
-  //timeRange,
-  defaultSort,
-  multipleSelection,
   onSearch,
   resetForm,
-  onSortChanged,
   exportAllExcel,
-  getPocList,
   handleDelete,
-  handleBulkDelete
-} = usePocHook();
+  openDialog,
+  getList,
+  status,
+  risks
+} = useHook();
 
-const opType = ref<"add" | "update">("add");
-const modalVisible = ref(false);
-const opRow = ref<PocPageResponse>();
-function openDialog(type: "add" | "update", row?: PocPageResponse) {
-  opType.value = type;
-  opRow.value = row;
-  modalVisible.value = true;
-}
+watch(
+  () => searchFormParams.project,
+  () => {
+    onSearch();
+  }
+);
 </script>
 
 <template>
   <div class="main">
-    <!-- 搜索栏 -->
     <el-form
-      ref="searchFormRef"
+      ref="formRef"
       :inline="true"
       :model="searchFormParams"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
@@ -179,74 +102,57 @@ function openDialog(type: "add" | "update", row?: PocPageResponse) {
           />
         </el-select>
       </el-form-item>
+
       <el-form-item>
         <el-button
           type="primary"
           :icon="useRenderIcon(Search)"
           :loading="pageLoading"
-          @click="onSearch(tableRef)"
+          @click="onSearch"
         >
           搜索
         </el-button>
-        <el-button
-          :icon="useRenderIcon(Refresh)"
-          @click="resetForm(searchFormRef, tableRef)"
-        >
+        <el-button :icon="useRenderIcon(Refresh)" @click="resetForm(formRef)">
           重置
         </el-button>
       </el-form-item>
     </el-form>
 
-    <!-- table bar 包裹  table -->
-    <PureTableBar title="POC项目列表" :columns="columns" @refresh="onSearch">
-      <!-- 表格操作栏 -->
+    <PureTableBar title="POC管理" :columns="columns" @refresh="onSearch">
       <template #buttons>
         <el-button
           type="primary"
           :icon="useRenderIcon(AddFill)"
-          @click="openDialog('add')"
+          @click="openDialog('新增')"
         >
           新增POC
         </el-button>
         <el-button
-          type="danger"
-          :icon="useRenderIcon(Delete)"
-          @click="handleBulkDelete(tableRef)"
+          type="warning"
+          :icon="useRenderIcon(Download)"
+          @click="exportAllExcel"
         >
-          批量删除
+          导出
         </el-button>
-        <el-button
-          type="primary"
-          @click="CommonUtils.exportExcel(columns, dataList, 'POC列表')"
-          >单页导出</el-button
-        >
-        <el-button type="primary" @click="exportAllExcel">全部导出</el-button>
       </template>
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
           border
-          ref="tableRef"
+          adaptive
           align-whole="center"
-          showOverflowTooltip
           table-layout="auto"
           :loading="pageLoading"
           :size="size"
-          adaptive
           :data="dataList"
           :columns="dynamicColumns"
-          :default-sort="defaultSort"
           :pagination="pagination"
           :paginationSmall="size === 'small' ? true : false"
           :header-cell-style="{
             background: 'var(--el-table-row-hover-bg-color)',
             color: 'var(--el-text-color-primary)'
           }"
-          @page-size-change="getPocList"
-          @page-current-change="getPocList"
-          @sort-change="onSortChanged"
-          @selection-change="
-            rows => (multipleSelection = rows.map(item => item.pocId))
-          "
+          @page-size-change="getList"
+          @page-current-change="getList"
         >
           <template #operation="{ row }">
             <el-button
@@ -254,20 +160,17 @@ function openDialog(type: "add" | "update", row?: PocPageResponse) {
               link
               type="primary"
               :size="size"
+              @click="openDialog('编辑', row)"
               :icon="useRenderIcon(EditPen)"
-              @click="openDialog('update', row)"
             >
-              编辑
+              修改
             </el-button>
-            <el-popconfirm
-              :title="`是否确认删除编号为${row.pocId}的这个POC`"
-              @confirm="handleDelete(row)"
-            >
+            <el-popconfirm title="是否确认删除?" @confirm="handleDelete(row)">
               <template #reference>
                 <el-button
                   class="reset-margin"
                   link
-                  type="danger"
+                  type="primary"
                   :size="size"
                   :icon="useRenderIcon(Delete)"
                 >
@@ -279,13 +182,6 @@ function openDialog(type: "add" | "update", row?: PocPageResponse) {
         </pure-table>
       </template>
     </PureTableBar>
-
-    <poc-form-modal
-      v-model="modalVisible"
-      :type="opType"
-      :row="opRow"
-      @success="onSearch"
-    />
   </div>
 </template>
 
