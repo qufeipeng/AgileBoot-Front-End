@@ -15,6 +15,10 @@ const dictionaryMapKey = "ag-dictionary-map";
 export const useUserStore = defineStore({
   id: "ag-user",
   state: (): userType => ({
+    // 用户ID
+    userId:
+      storageSession().getItem<TokenDTO>(sessionKey)?.currentUser.userInfo
+        .userId ?? "",
     // 用户名
     username:
       storageSession().getItem<TokenDTO>(sessionKey)?.currentUser.userInfo
@@ -39,6 +43,11 @@ export const useUserStore = defineStore({
       storageSession().getItem<TokenDTO>(sessionKey)?.currentUser.userInfo ?? {}
   }),
   actions: {
+    /** 存储用户ID */
+    SET_USER_ID(userId: number) {
+      /** TODO 这里不是应该再进一步存到sessionStorage中吗 */
+      this.userId = userId;
+    },
     /** 存储用户名 */
     SET_USERNAME(username: string) {
       /** TODO 这里不是应该再进一步存到sessionStorage中吗 */
@@ -82,6 +91,7 @@ export const useUserStore = defineStore({
 
     /** 前端登出（不调用接口） */
     logOut() {
+      this.userId = 0;
       this.username = "";
       this.deptId = 0;
       this.roles = [];

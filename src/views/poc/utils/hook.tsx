@@ -7,6 +7,7 @@ import { CommonUtils } from "@/utils/common";
 import { addDialog } from "@/components/ReDialog";
 import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
 import { getDeptListApi } from "@/api/system/dept";
+import { getUserListApi } from "@/api/system/user";
 import {
   PocListCommand,
   getPocListApi,
@@ -17,6 +18,7 @@ import {
   UpdatePocCommand
 } from "@/api/poc";
 import { useUserStoreHook } from "@/store/modules/user";
+import provinces from "./province.json";
 
 export function useHook() {
   const searchFormParams = reactive<PocListCommand>({
@@ -41,6 +43,11 @@ export function useHook() {
   });
 
   const deptTreeList = ref([]);
+
+  const userList = ref([]);
+
+  const isDisabled = ref(false);
+  isDisabled.value = useUserStoreHook().roles[0] != "admin";
 
   const status = [
     {
@@ -108,11 +115,100 @@ export function useHook() {
     }
   ];
 
-  const columns: TableColumnList = [
+  const industrys = [
     {
-      type: "selection",
-      align: "left"
+      value: "0",
+      label: "政务"
     },
+    {
+      value: "1",
+      label: "燃气"
+    },
+    {
+      value: "2",
+      label: "水务"
+    },
+    {
+      value: "3",
+      label: "金融-银行"
+    },
+    {
+      value: "4",
+      label: "金融-非银"
+    },
+    {
+      value: "5",
+      label: "电力"
+    },
+    {
+      value: "6",
+      label: "石油"
+    },
+    {
+      value: "7",
+      label: "医疗"
+    },
+    {
+      value: "8",
+      label: "教育"
+    },
+    {
+      value: "9",
+      label: "交通"
+    },
+    {
+      value: "10",
+      label: "其他"
+    }
+  ];
+
+  const deployments = [
+    {
+      value: "0",
+      label: "单机"
+    },
+    {
+      value: "1",
+      label: "主备"
+    },
+    {
+      value: "2",
+      label: "共享集群"
+    },
+    {
+      value: "3",
+      label: "分布式"
+    }
+  ];
+
+  const compatibilitys = [
+    {
+      value: "0",
+      label: "Oracle"
+    },
+    {
+      value: "1",
+      label: "MySQL"
+    },
+    {
+      value: "2",
+      label: "PG"
+    },
+    {
+      value: "3",
+      label: "DB2"
+    },
+    {
+      value: "4",
+      label: "DM"
+    }
+  ];
+
+  const columns: TableColumnList = [
+    // {
+    //   type: "selection",
+    //   align: "left"
+    // },
     {
       label: "POC编号",
       prop: "pocId",
@@ -125,14 +221,14 @@ export function useHook() {
     },
     {
       label: "当前责任人",
-      prop: "owner",
+      prop: "ownerUsername",
       minWidth: 120
     },
     {
       label: "状态",
       prop: "status",
       minWidth: 120,
-      cellRenderer: ({ row }) => status[row.status].label
+      cellRenderer: ({ row }) => status[row.status]?.label ?? ""
     },
     {
       label: "客户名称",
@@ -153,11 +249,11 @@ export function useHook() {
       label: "风险",
       prop: "risk",
       minWidth: 120,
-      cellRenderer: ({ row }) => risks[row.risk].label
+      cellRenderer: ({ row }) => risks[row.risk]?.label ?? ""
     },
     {
       label: "待处理&风险描述",
-      prop: "todo_risk",
+      prop: "todoRisk",
       minWidth: 120
     },
     {
@@ -176,8 +272,8 @@ export function useHook() {
       minWidth: 120
     },
     {
-      label: "poc人员",
-      prop: "poc",
+      label: "POC人员",
+      prop: "pocUsername",
       minWidth: 120
     },
     {
@@ -221,12 +317,14 @@ export function useHook() {
     {
       label: "省份",
       prop: "province",
-      minWidth: 120
+      minWidth: 120,
+      cellRenderer: ({ row }) => provinces[row.province]?.label ?? ""
     },
     {
       label: "行业",
       prop: "industry",
-      minWidth: 120
+      minWidth: 120,
+      cellRenderer: ({ row }) => industrys[row.industry]?.label ?? ""
     },
     {
       label: "ISV",
@@ -246,12 +344,14 @@ export function useHook() {
     {
       label: "部署形态",
       prop: "deployment",
-      minWidth: 120
+      minWidth: 120,
+      cellRenderer: ({ row }) => deployments[row.deployment]?.label ?? ""
     },
     {
       label: "兼容性需求",
       prop: "compatibility",
-      minWidth: 120
+      minWidth: 120,
+      cellRenderer: ({ row }) => compatibilitys[row.compatibility]?.label ?? ""
     },
     {
       label: "相关组件",
@@ -347,17 +447,17 @@ export function useHook() {
       props: {
         formInline: {
           pocId: row?.pocId ?? 0,
-          owner: row?.owner ?? useUserStoreHook().username,
+          owner: row?.owner ?? useUserStoreHook().userId,
           status: row?.status ?? "",
           customer: row?.customer ?? "",
           project: row?.project ?? "",
           progress: row?.progress ?? 0,
           risk: row?.risk ?? "",
-          todo_risk: row?.todo_risk ?? "",
+          todoRisk: row?.todoRisk ?? "",
           done: row?.done ?? "",
           sales: row?.sales ?? "",
           sa: row?.sa ?? "",
-          poc: row?.poc ?? "",
+          poc: row?.poc ?? useUserStoreHook().userId,
           op: row?.op ?? "",
           kv: row?.kv ?? "",
           pocStartDt: row?.pocStartDt ?? undefined,
@@ -377,10 +477,16 @@ export function useHook() {
         },
         deptOptions: deptTreeList,
         statusOptions: status,
-        riskOptions: risks
+        riskOptions: risks,
+        userOptions: userList,
+        provinceOptions: provinces,
+        industryOptions: industrys,
+        deploymentOptions: deployments,
+        compatibilityOptions: compatibilitys,
+        isDisabled: isDisabled
       },
 
-      width: "60%",
+      width: "70%",
       draggable: true,
       fullscreenIcon: true,
       closeOnClickModal: false,
@@ -431,6 +537,8 @@ export function useHook() {
       handleTree(deptResponse.data),
       "status"
     );
+    const userResponse = await getUserListApi({});
+    userList.value = userResponse.data.rows;
   });
 
   return {
@@ -447,6 +555,7 @@ export function useHook() {
     getList,
     handleDelete,
     status,
-    risks
+    risks,
+    userList
   };
 }

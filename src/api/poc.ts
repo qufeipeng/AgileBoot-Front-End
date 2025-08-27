@@ -10,7 +10,7 @@ export interface PocListCommand extends BasePageQuery {
 
 export interface PocPageResponse {
   pocId: number;
-  owner: string;
+  ownerUsername: string;
   status: string;
   customer: string;
   project: string;
@@ -20,7 +20,7 @@ export interface PocPageResponse {
   done: string;
   sales: string;
   sa: string;
-  poc: string;
+  pocUsername: string;
   op: string;
   kv: string;
   pocStartDt: Date;
@@ -59,15 +59,6 @@ export const exportPocExcelApi = (params: PocListCommand, fileName: string) => {
   });
 };
 
-export const deletePocApi = (data: Array<number>) => {
-  return http.request<ResponseData<void>>("delete", "/poc", {
-    params: {
-      // 需要将数组转换为字符串  否则Axios会将参数变成 noticeIds[0]:1  noticeIds[1]:2 这种格式，后端接收参数不成功
-      ids: data.toString()
-    }
-  });
-};
-
 export interface AddPocCommand {
   owner: string;
   status: string;
@@ -75,7 +66,7 @@ export interface AddPocCommand {
   project: string;
   progress: number;
   risk: string;
-  todo_risk: string;
+  todoRisk: string;
   done: string;
   sales: string;
   sa: string;
@@ -107,6 +98,10 @@ export const addPocApi = (data: AddPocCommand) => {
 export interface UpdatePocCommand extends AddPocCommand {
   pocId: number;
 }
+
+export const deletePocApi = (pocId: number) => {
+  return http.request<ResponseData<void>>("delete", `/poc/${pocId}`);
+};
 
 export const updatePocApi = (pocId: number, data?: UpdatePocCommand) => {
   return http.request<ResponseData<void>>("put", `/poc/${pocId}`, {

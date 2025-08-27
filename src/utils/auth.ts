@@ -40,6 +40,7 @@ export function setTokenFromBackend(data: TokenDTO): void {
   const cookieString = JSON.stringify(data);
   Cookies.set(tokenKey, cookieString);
 
+  useUserStoreHook().SET_USER_ID(data.currentUser.userInfo.userId);
   useUserStoreHook().SET_USERNAME(data.currentUser.userInfo.username);
   useUserStoreHook().SET_DEPT_ID(data.currentUser.userInfo.deptId);
   useUserStoreHook().SET_ROLES([data.currentUser.roleKey]);

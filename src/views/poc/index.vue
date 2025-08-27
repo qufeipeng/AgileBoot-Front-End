@@ -29,7 +29,8 @@ const {
   openDialog,
   getList,
   status,
-  risks
+  risks,
+  userList
 } = useHook();
 
 watch(
@@ -64,13 +65,21 @@ watch(
           class="!w-[200px]"
         />
       </el-form-item>
-      <el-form-item label="负责人" prop="owner">
-        <el-input
+      <el-form-item label="当前责任人" prop="owner">
+        <el-select
           v-model="searchFormParams.owner"
-          placeholder="请选择负责人"
+          placeholder="请选择当前责任人"
           clearable
-          class="!w-[200px]"
-        />
+          class="!w-[180px]"
+        >
+          <el-option
+            v-for="item in userList"
+            :key="item.userId"
+            :label="item.username"
+            :value="item.userId"
+            :disabled="item.status == 0"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select
@@ -118,7 +127,7 @@ watch(
       </el-form-item>
     </el-form>
 
-    <PureTableBar title="POC管理" :columns="columns" @refresh="onSearch">
+    <PureTableBar title="POC项目列表" :columns="columns" @refresh="onSearch">
       <template #buttons>
         <el-button
           type="primary"
