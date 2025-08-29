@@ -6,7 +6,7 @@ import { UpdatePocCommand } from "@/api/poc";
 
 interface FormProps {
   formInline: UpdatePocCommand;
-  deptOptions: any[];
+  //deptOptions: any[];
   statusOptions: any[];
   riskOptions: any[];
   userOptions: any[];
@@ -48,7 +48,7 @@ const props = withDefaults(defineProps<FormProps>(), {
     notes: "",
     deptId: 0
   }),
-  deptOptions: () => [],
+  //deptOptions: () => [],
   statusOptions: () => [],
   riskOptions: () => [],
   userOptions: () => [],
@@ -60,7 +60,7 @@ const props = withDefaults(defineProps<FormProps>(), {
 });
 
 const newFormInline = ref(props.formInline);
-const deptOptions = ref(props.deptOptions);
+//const deptOptions = ref(props.deptOptions);
 const statusOptions = ref(props.statusOptions);
 const riskOptions = ref(props.riskOptions);
 const userOptions = ref(props.userOptions);
@@ -98,7 +98,7 @@ defineExpose({ getFormRuleRef });
             <el-option
               v-for="item in userOptions"
               :key="item.userId"
-              :label="item.username"
+              :label="item.nickname"
               :value="item.userId"
               :disabled="item.status == 0"
             />
@@ -106,7 +106,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <!-- <re-col :value="8">
         <el-form-item label="项目组">
           <el-tree-select
             class="w-full"
@@ -125,7 +125,7 @@ defineExpose({ getFormRuleRef });
             placeholder="请选择项目组"
           />
         </el-form-item>
-      </re-col>
+      </re-col> -->
 
       <re-col :value="8">
         <el-form-item label="客户" prop="customer">
@@ -247,7 +247,7 @@ defineExpose({ getFormRuleRef });
             <el-option
               v-for="item in userOptions"
               :key="item.userId"
-              :label="item.username"
+              :label="item.nickname"
               :value="item.userId"
               :disabled="item.status == 0"
             />
