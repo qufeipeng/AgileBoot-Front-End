@@ -409,6 +409,9 @@ export function useHook() {
     const statusResponse = await getDictListApi("status");
     status.value = statusResponse.data;
 
+    const risksResponse = await getDictListApi("risk");
+    risks.value = risksResponse.data;
+
     const industrysResponse = await getDictListApi("industry");
     industrys.value = industrysResponse.data;
 
