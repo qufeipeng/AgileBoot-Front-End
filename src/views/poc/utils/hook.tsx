@@ -5,9 +5,10 @@ import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, toRaw, h } from "vue";
 import { CommonUtils } from "@/utils/common";
 import { addDialog } from "@/components/ReDialog";
-import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
-import { getDeptListApi } from "@/api/system/dept";
+//import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
+//import { getDeptListApi } from "@/api/system/dept";
 import { getUserListApi } from "@/api/system/user";
+import { getDictListApi } from "@/api/dict";
 import {
   PocListCommand,
   getPocListApi,
@@ -18,7 +19,6 @@ import {
   UpdatePocCommand
 } from "@/api/poc";
 import { useUserStoreHook } from "@/store/modules/user";
-import provinces from "./province.json";
 
 export function useHook() {
   const searchFormParams = reactive<PocListCommand>({
@@ -42,167 +42,24 @@ export function useHook() {
     background: true
   });
 
-  const deptTreeList = ref([]);
+  //const deptTreeList = ref([]);
 
   const userList = ref([]);
 
+  const status = ref([]);
+
+  const risks = ref([]);
+
+  const industrys = ref([]);
+
+  const deployments = ref([]);
+
+  const compatibilitys = ref([]);
+
+  const provinces = ref([]);
+
   const isDisabled = ref(false);
   isDisabled.value = useUserStoreHook().roles[0] != "admin";
-
-  const status = [
-    {
-      value: "0",
-      label: "待启动"
-    },
-    {
-      value: "1",
-      label: "POC中"
-    },
-    {
-      value: "2",
-      label: "POC暂停"
-    },
-    {
-      value: "3",
-      label: "POC完成-待推进"
-    },
-    {
-      value: "4",
-      label: "POC完成-取消"
-    },
-    {
-      value: "5",
-      label: "上线实施中"
-    },
-    {
-      value: "6",
-      label: "已上线"
-    },
-    {
-      value: "7",
-      label: "转维护"
-    },
-    {
-      value: "8",
-      label: "生态适配中"
-    },
-    {
-      value: "9",
-      label: "生态适配完成"
-    },
-    {
-      value: "10",
-      label: "取消"
-    },
-    {
-      value: "11",
-      label: "其他"
-    }
-  ];
-
-  const risks = [
-    {
-      value: "0",
-      label: "无风险"
-    },
-    {
-      value: "1",
-      label: "低风险"
-    },
-    {
-      value: "2",
-      label: "高风险"
-    }
-  ];
-
-  const industrys = [
-    {
-      value: "0",
-      label: "政务"
-    },
-    {
-      value: "1",
-      label: "燃气"
-    },
-    {
-      value: "2",
-      label: "水务"
-    },
-    {
-      value: "3",
-      label: "金融-银行"
-    },
-    {
-      value: "4",
-      label: "金融-非银"
-    },
-    {
-      value: "5",
-      label: "电力"
-    },
-    {
-      value: "6",
-      label: "石油"
-    },
-    {
-      value: "7",
-      label: "医疗"
-    },
-    {
-      value: "8",
-      label: "教育"
-    },
-    {
-      value: "9",
-      label: "交通"
-    },
-    {
-      value: "10",
-      label: "其他"
-    }
-  ];
-
-  const deployments = [
-    {
-      value: "0",
-      label: "单机"
-    },
-    {
-      value: "1",
-      label: "主备"
-    },
-    {
-      value: "2",
-      label: "共享集群"
-    },
-    {
-      value: "3",
-      label: "分布式"
-    }
-  ];
-
-  const compatibilitys = [
-    {
-      value: "0",
-      label: "Oracle"
-    },
-    {
-      value: "1",
-      label: "MySQL"
-    },
-    {
-      value: "2",
-      label: "PG"
-    },
-    {
-      value: "3",
-      label: "DB2"
-    },
-    {
-      value: "4",
-      label: "DM"
-    }
-  ];
 
   const columns: TableColumnList = [
     // {
@@ -226,9 +83,9 @@ export function useHook() {
     },
     {
       label: "状态",
-      prop: "status",
-      minWidth: 120,
-      cellRenderer: ({ row }) => status[row.status]?.label ?? ""
+      prop: "statusName",
+      minWidth: 120
+      // cellRenderer: ({ row }) => status[row.status]?.label ?? ""
     },
     {
       label: "客户名称",
@@ -243,13 +100,14 @@ export function useHook() {
     {
       label: "进度",
       prop: "progress",
-      minWidth: 100
+      minWidth: 100,
+      cellRenderer: ({ row }) => row.progress + "%"
     },
     {
       label: "风险",
-      prop: "risk",
-      minWidth: 120,
-      cellRenderer: ({ row }) => risks[row.risk]?.label ?? ""
+      prop: "riskName",
+      minWidth: 120
+      // cellRenderer: ({ row }) => risks[row.risk]?.label ?? ""
     },
     {
       label: "待处理&风险描述",
@@ -270,6 +128,12 @@ export function useHook() {
       label: "售前",
       prop: "sa",
       minWidth: 120
+    },
+    {
+      label: "POC人员ID",
+      prop: "poc",
+      minWidth: 120,
+      hide: true
     },
     {
       label: "POC人员",
@@ -316,15 +180,15 @@ export function useHook() {
     },
     {
       label: "省份",
-      prop: "province",
-      minWidth: 120,
-      cellRenderer: ({ row }) => provinces[row.province]?.label ?? ""
+      prop: "provinceName",
+      minWidth: 120
+      // cellRenderer: ({ row }) => provinces[row.province]?.label ?? ""
     },
     {
       label: "行业",
-      prop: "industry",
-      minWidth: 120,
-      cellRenderer: ({ row }) => industrys[row.industry]?.label ?? ""
+      prop: "industryName",
+      minWidth: 120
+      // cellRenderer: ({ row }) => industrys[row.industry]?.label ?? ""
     },
     {
       label: "ISV",
@@ -343,15 +207,15 @@ export function useHook() {
     },
     {
       label: "部署形态",
-      prop: "deployment",
-      minWidth: 120,
-      cellRenderer: ({ row }) => deployments[row.deployment]?.label ?? ""
+      prop: "deploymentName",
+      minWidth: 120
+      // cellRenderer: ({ row }) => deployments[row.deployment]?.label ?? ""
     },
     {
       label: "兼容性需求",
-      prop: "compatibility",
-      minWidth: 120,
-      cellRenderer: ({ row }) => compatibilitys[row.compatibility]?.label ?? ""
+      prop: "compatibilityName",
+      minWidth: 120
+      // cellRenderer: ({ row }) => compatibilitys[row.compatibility]?.label ?? ""
     },
     {
       label: "相关组件",
@@ -475,7 +339,7 @@ export function useHook() {
           notes: row?.notes ?? "",
           deptId: row?.deptId ?? useUserStoreHook().deptId
         },
-        deptOptions: deptTreeList,
+        //deptOptions: deptTreeList,
         statusOptions: status,
         riskOptions: risks,
         userOptions: userList,
@@ -532,13 +396,30 @@ export function useHook() {
 
   onMounted(async () => {
     onSearch();
-    const deptResponse = await getDeptListApi();
-    deptTreeList.value = await setDisabledForTreeOptions(
-      handleTree(deptResponse.data),
-      "status"
-    );
+
+    // const deptResponse = await getDeptListApi();
+    // deptTreeList.value = await setDisabledForTreeOptions(
+    //   handleTree(deptResponse.data),
+    //   "status"
+    // );
+
     const userResponse = await getUserListApi({});
     userList.value = userResponse.data.rows;
+
+    const statusResponse = await getDictListApi("status");
+    status.value = statusResponse.data;
+
+    const industrysResponse = await getDictListApi("industry");
+    industrys.value = industrysResponse.data;
+
+    const deploymentsResponse = await getDictListApi("deployment");
+    deployments.value = deploymentsResponse.data;
+
+    const compatibilitysResponse = await getDictListApi("compatibility");
+    compatibilitys.value = compatibilitysResponse.data;
+
+    const provincesResponse = await getDictListApi("province");
+    provinces.value = provincesResponse.data;
   });
 
   return {

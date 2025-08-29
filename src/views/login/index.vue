@@ -12,14 +12,14 @@ import Motion from "./utils/motion";
 import { useRouter } from "vue-router";
 import { message } from "@/utils/message";
 import { loginRules } from "./utils/rule";
-import phone from "./components/phone.vue";
+//import phone from "./components/phone.vue";
 import TypeIt from "@/components/ReTypeit";
-import qrCode from "./components/qrCode.vue";
-import register from "./components/register.vue";
-import resetPassword from "./components/resetPassword.vue";
+//import qrCode from "./components/qrCode.vue";
+//import register from "./components/register.vue";
+//import resetPassword from "./components/resetPassword.vue";
 import { useNav } from "@/layout/hooks/useNav";
 import type { FormInstance } from "element-plus";
-import { operates, thirdParty } from "./utils/enums";
+//import { operates, thirdParty } from "./utils/enums";
 import { useLayout } from "@/layout/hooks/useLayout";
 import { rsaEncrypt } from "@/utils/crypt";
 import { getTopMenu, initRouter } from "@/router/utils";
@@ -249,12 +249,12 @@ onBeforeUnmount(() => {
 
             <Motion :delay="250">
               <el-form-item>
-                <div class="w-full h-[20px] flex justify-between items-center">
+                <!-- <div class="w-full h-[20px] flex justify-between items-center">
                   <el-checkbox v-model="isRememberMe"> 记住密码</el-checkbox>
                   <el-button link type="primary" @click="currentPage = 4">
                     忘记密码
                   </el-button>
-                </div>
+                </div> -->
                 <el-button
                   :loading="loading"
                   class="w-full mt-4"
@@ -267,7 +267,7 @@ onBeforeUnmount(() => {
               </el-form-item>
             </Motion>
 
-            <Motion :delay="300">
+            <!-- <Motion :delay="300">
               <el-form-item>
                 <div class="w-full h-[20px] flex justify-between items-center">
                   <el-button
@@ -281,10 +281,10 @@ onBeforeUnmount(() => {
                   </el-button>
                 </div>
               </el-form-item>
-            </Motion>
+            </Motion> -->
           </el-form>
 
-          <Motion v-if="currentPage === 0" :delay="350">
+          <!-- <Motion v-if="currentPage === 0" :delay="350">
             <el-form-item>
               <el-divider>
                 <p class="text-xs text-gray-500">{{ "第三方登录" }}</p>
@@ -303,21 +303,21 @@ onBeforeUnmount(() => {
                 </span>
               </div>
             </el-form-item>
-          </Motion>
+          </Motion> -->
           <!-- 手机号登录 -->
-          <phone v-if="currentPage === 1" v-model:current-page="currentPage" />
+          <!-- <phone v-if="currentPage === 1" v-model:current-page="currentPage" /> -->
           <!-- 二维码登录 -->
-          <qrCode v-if="currentPage === 2" v-model:current-page="currentPage" />
+          <!-- <qrCode v-if="currentPage === 2" v-model:current-page="currentPage" /> -->
           <!-- 注册 -->
-          <register
+          <!-- <register
             v-if="currentPage === 3"
             v-model:current-page="currentPage"
-          />
+          /> -->
           <!-- 忘记密码 -->
-          <resetPassword
+          <!-- <resetPassword
             v-if="currentPage === 4"
             v-model:current-page="currentPage"
-          />
+          /> -->
         </div>
       </div>
     </div>
