@@ -49,6 +49,17 @@ export const getDeptListApi = (params?: DeptQuery) => {
   });
 };
 
+/** 获取部门列表 */
+export const getDeptAndUserListApi = (params?: DeptQuery) => {
+  return http.request<ResponseData<Array<DeptDTO>>>(
+    "get",
+    "/system/deptAndUsers",
+    {
+      params
+    }
+  );
+};
+
 /** 新增部门 */
 export const addDeptApi = (data: DeptRequest) => {
   console.log(data);

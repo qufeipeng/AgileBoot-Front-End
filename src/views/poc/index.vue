@@ -30,7 +30,7 @@ const {
   getList,
   status,
   risks,
-  userList
+  deptTreeList
 } = useHook();
 
 watch(
@@ -65,7 +65,7 @@ watch(
           class="!w-[200px]"
         />
       </el-form-item>
-      <el-form-item label="当前责任人" prop="owner">
+      <!-- <el-form-item label="当前责任人" prop="owner">
         <el-select
           v-model="searchFormParams.owner"
           placeholder="请选择当前责任人"
@@ -80,6 +80,40 @@ watch(
             :disabled="item.status == 0"
           />
         </el-select>
+      </el-form-item> -->
+      <el-form-item label="当前责任人" prop="owner">
+        <el-tree-select
+          class="w-full"
+          v-model="searchFormParams.owner"
+          :data="deptTreeList"
+          :show-all-levels="false"
+          value-key="id"
+          :props="{
+            value: 'id',
+            label: 'deptName',
+            emitPath: false,
+            checkStrictly: true
+          }"
+          clearable
+          placeholder="请选择当前责任人"
+        />
+      </el-form-item>
+      <el-form-item label="POC人员" prop="poc">
+        <el-tree-select
+          class="w-full"
+          v-model="searchFormParams.poc"
+          :data="deptTreeList"
+          :show-all-levels="false"
+          value-key="id"
+          :props="{
+            value: 'id',
+            label: 'deptName',
+            emitPath: false,
+            checkStrictly: true
+          }"
+          clearable
+          placeholder="请选择POC人员"
+        />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select

@@ -4,7 +4,8 @@ export interface PocListCommand extends BasePageQuery {
   customer?: string;
   project?: string;
   status?: string;
-  owner?: string;
+  owner?: number;
+  poc?: number;
   risk?: string;
 }
 
@@ -60,7 +61,7 @@ export const exportPocExcelApi = (params: PocListCommand, fileName: string) => {
 };
 
 export interface AddPocCommand {
-  owner: string;
+  owner: number;
   status: string;
   customer: string;
   project: string;
@@ -70,7 +71,7 @@ export interface AddPocCommand {
   done: string;
   sales: string;
   sa: string;
-  poc: string;
+  poc: number;
   op: string;
   kv: string;
   pocStartDt: Date;
@@ -86,7 +87,7 @@ export interface AddPocCommand {
   compatibility: string;
   plugins: string;
   notes: string;
-  deptId: number;
+  //deptId: number;
 }
 
 export const addPocApi = (data: AddPocCommand) => {

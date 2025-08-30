@@ -14,7 +14,7 @@ interface FormProps {
   industryOptions: any[];
   deploymentOptions: any[];
   compatibilityOptions: any[];
-  isDisabled: any;
+  //isDisabled: any;
 }
 
 const props = withDefaults(defineProps<FormProps>(), {
@@ -55,8 +55,8 @@ const props = withDefaults(defineProps<FormProps>(), {
   provinceOptions: () => [],
   industryOptions: () => [],
   deploymentOptions: () => [],
-  compatibilityOptions: () => [],
-  isDisabled: false
+  compatibilityOptions: () => []
+  //isDisabled: false
 });
 
 const newFormInline = ref(props.formInline);
@@ -85,8 +85,8 @@ defineExpose({ getFormRuleRef });
     :rules="formRules"
     label-width="130px"
   >
-    <el-row :gutter="30">
-      <re-col :value="8">
+    <el-row :gutter="20">
+      <!-- <re-col :value="8">
         <el-form-item label="当前责任人" prop="owner">
           <el-select
             class="w-full"
@@ -103,6 +103,26 @@ defineExpose({ getFormRuleRef });
               :disabled="item.status == 0"
             />
           </el-select>
+        </el-form-item>
+      </re-col> -->
+
+      <re-col :value="8">
+        <el-form-item label="当前责任人" prop="owner">
+          <el-tree-select
+            class="w-full"
+            v-model="newFormInline.owner"
+            :data="userOptions"
+            :show-all-levels="false"
+            value-key="id"
+            :props="{
+              value: 'id',
+              label: 'deptName',
+              emitPath: false,
+              checkStrictly: true
+            }"
+            clearable
+            placeholder="请选择当前责任人"
+          />
         </el-form-item>
       </re-col>
 
@@ -235,7 +255,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <!-- <re-col :value="8">
         <el-form-item label="POC人员" prop="poc">
           <el-select
             class="w-full"
@@ -252,6 +272,26 @@ defineExpose({ getFormRuleRef });
               :disabled="item.status == 0"
             />
           </el-select>
+        </el-form-item>
+      </re-col> -->
+
+      <re-col :value="8">
+        <el-form-item label="POC人员" prop="poc">
+          <el-tree-select
+            class="w-full"
+            v-model="newFormInline.poc"
+            :data="userOptions"
+            :show-all-levels="false"
+            value-key="id"
+            :props="{
+              value: 'id',
+              label: 'deptName',
+              emitPath: false,
+              checkStrictly: true
+            }"
+            clearable
+            placeholder="请选择POC人员"
+          />
         </el-form-item>
       </re-col>
 

@@ -5,9 +5,9 @@ import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, toRaw, h } from "vue";
 import { CommonUtils } from "@/utils/common";
 import { addDialog } from "@/components/ReDialog";
-//import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
-//import { getDeptListApi } from "@/api/system/dept";
-import { getUserListApi } from "@/api/system/user";
+import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
+import { getDeptAndUserListApi } from "@/api/system/dept";
+//import { getUserListApi } from "@/api/system/user";
 import { getDictListApi } from "@/api/dict";
 import {
   PocListCommand,
@@ -26,6 +26,7 @@ export function useHook() {
     project: undefined,
     status: undefined,
     owner: undefined,
+    poc: undefined,
     risk: undefined,
     timeRangeColumn: "createTime"
   });
@@ -42,9 +43,9 @@ export function useHook() {
     background: true
   });
 
-  //const deptTreeList = ref([]);
+  const deptTreeList = ref([]);
 
-  const userList = ref([]);
+  //const userList = ref([]);
 
   const status = ref([]);
 
@@ -58,8 +59,8 @@ export function useHook() {
 
   const provinces = ref([]);
 
-  const isDisabled = ref(false);
-  isDisabled.value = useUserStoreHook().roles[0] != "admin";
+  //const isDisabled = ref(false);
+  //isDisabled.value = useUserStoreHook().roles[0] != "admin";
 
   const columns: TableColumnList = [
     // {
@@ -69,33 +70,33 @@ export function useHook() {
     {
       label: "POC编号",
       prop: "pocId",
-      minWidth: 100
+      minWidth: 80
     },
     {
       label: "项目组",
       prop: "deptName",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "当前责任人",
       prop: "ownerUsername",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "状态",
       prop: "statusName",
-      minWidth: 120
+      minWidth: 100
       // cellRenderer: ({ row }) => status[row.status]?.label ?? ""
     },
     {
       label: "客户名称",
       prop: "customer",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "项目名称",
       prop: "project",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "进度",
@@ -106,74 +107,74 @@ export function useHook() {
     {
       label: "风险",
       prop: "riskName",
-      minWidth: 120
+      minWidth: 100
       // cellRenderer: ({ row }) => risks[row.risk]?.label ?? ""
     },
     {
       label: "待处理&风险描述",
       prop: "todoRisk",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "已完成进展",
       prop: "done",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "销售",
       prop: "sales",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "售前",
       prop: "sa",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "POC人员ID",
       prop: "poc",
-      minWidth: 120,
+      minWidth: 100,
       hide: true
     },
     {
       label: "POC人员",
       prop: "pocUsername",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "运维",
       prop: "op",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "重点项目",
       prop: "kv",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "开始日期",
-      minWidth: 120,
+      minWidth: 100,
       prop: "pocStartDt",
       sortable: "custom",
       formatter: ({ pocStartDt }) => dayjs(pocStartDt).format("YYYY-MM-DD")
     },
     {
       label: "POC完成日期",
-      minWidth: 120,
+      minWidth: 100,
       prop: "pocEndDt",
       sortable: "custom",
       formatter: ({ pocEndDt }) => dayjs(pocEndDt).format("YYYY-MM-DD")
     },
     {
       label: "上线日期",
-      minWidth: 120,
+      minWidth: 100,
       prop: "onlineDt",
       sortable: "custom",
       formatter: ({ onlineDt }) => dayjs(onlineDt).format("YYYY-MM-DD")
     },
     {
       label: "最后更新日期",
-      minWidth: 120,
+      minWidth: 100,
       prop: "lastUpdDt",
       sortable: "custom",
       formatter: ({ lastUpdDt }) => dayjs(lastUpdDt).format("YYYY-MM-DD")
@@ -181,56 +182,56 @@ export function useHook() {
     {
       label: "省份",
       prop: "provinceName",
-      minWidth: 120
+      minWidth: 100
       // cellRenderer: ({ row }) => provinces[row.province]?.label ?? ""
     },
     {
       label: "行业",
       prop: "industryName",
-      minWidth: 120
+      minWidth: 100
       // cellRenderer: ({ row }) => industrys[row.industry]?.label ?? ""
     },
     {
       label: "ISV",
       prop: "isv",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "运维厂商",
       prop: "maintenance",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "版本号",
       prop: "version",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "部署形态",
       prop: "deploymentName",
-      minWidth: 120
+      minWidth: 100
       // cellRenderer: ({ row }) => deployments[row.deployment]?.label ?? ""
     },
     {
       label: "兼容性需求",
       prop: "compatibilityName",
-      minWidth: 120
+      minWidth: 100
       // cellRenderer: ({ row }) => compatibilitys[row.compatibility]?.label ?? ""
     },
     {
       label: "相关组件",
       prop: "plugins",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "备注",
       prop: "notes",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "创建者",
       prop: "creatorName",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "创建时间",
@@ -243,7 +244,7 @@ export function useHook() {
     {
       label: "更新者",
       prop: "updaterName",
-      minWidth: 120
+      minWidth: 100
     },
     {
       label: "更新时间",
@@ -336,24 +337,26 @@ export function useHook() {
           deployment: row?.deployment ?? "",
           compatibility: row?.compatibility ?? "",
           plugins: row?.plugins ?? "",
-          notes: row?.notes ?? "",
-          deptId: row?.deptId ?? useUserStoreHook().deptId
+          notes: row?.notes ?? ""
+          //deptId: row?.deptId ?? useUserStoreHook().deptId
         },
         //deptOptions: deptTreeList,
         statusOptions: status,
         riskOptions: risks,
-        userOptions: userList,
+        //userOptions: userList,
+        userOptions: deptTreeList,
         provinceOptions: provinces,
         industryOptions: industrys,
         deploymentOptions: deployments,
-        compatibilityOptions: compatibilitys,
-        isDisabled: isDisabled
+        compatibilityOptions: compatibilitys
+        //isDisabled: isDisabled
       },
 
       width: "70%",
       draggable: true,
       fullscreenIcon: true,
       closeOnClickModal: false,
+      alignCenter: true,
       contentRenderer: () => h(editForm, { ref: formRef }),
       beforeSure: (done, { options }) => {
         const formRuleRef = formRef.value.getFormRuleRef();
@@ -397,14 +400,14 @@ export function useHook() {
   onMounted(async () => {
     onSearch();
 
-    // const deptResponse = await getDeptListApi();
-    // deptTreeList.value = await setDisabledForTreeOptions(
-    //   handleTree(deptResponse.data),
-    //   "status"
-    // );
+    const deptResponse = await getDeptAndUserListApi({});
+    deptTreeList.value = await setDisabledForTreeOptions(
+      handleTree(deptResponse.data),
+      "status"
+    );
 
-    const userResponse = await getUserListApi({});
-    userList.value = userResponse.data.rows;
+    //const userResponse = await getUserListApi({});
+    //userList.value = userResponse.data.rows;
 
     const statusResponse = await getDictListApi("status");
     status.value = statusResponse.data;
@@ -440,6 +443,6 @@ export function useHook() {
     handleDelete,
     status,
     risks,
-    userList
+    deptTreeList
   };
 }

@@ -8,7 +8,7 @@ export const formRules = reactive(<FormRules>{
   customer: [{ required: true, message: "客户名称为必填项", trigger: "blur" }],
   project: [{ required: true, message: "项目名称为必填项", trigger: "blur" }],
   risk: [{ required: true, message: "风险为必填项", trigger: "change" }],
-  poc: [{ required: true, message: "poc人员为必填项", trigger: "change" }],
+  //poc: [{ required: true, message: "poc人员为必填项", trigger: "change" }],
   province: [{ required: true, message: "省份为必填项", trigger: "change" }],
   industry: [{ required: true, message: "行业为必填项", trigger: "change" }]
 });
