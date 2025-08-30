@@ -86,11 +86,10 @@ defineExpose({ getFormRuleRef });
     label-width="130px"
   >
     <el-row :gutter="20">
-      <!-- <re-col :value="8">
+      <re-col :value="8">
         <el-form-item label="当前责任人" prop="owner">
           <el-select
             class="w-full"
-            :disabled="isDisabled"
             v-model="newFormInline.owner"
             placeholder="请选择当前责任人"
             clearable
@@ -104,9 +103,9 @@ defineExpose({ getFormRuleRef });
             />
           </el-select>
         </el-form-item>
-      </re-col> -->
+      </re-col>
 
-      <re-col :value="8">
+      <!-- <re-col :value="8">
         <el-form-item label="当前责任人" prop="owner">
           <el-tree-select
             class="w-full"
@@ -121,10 +120,11 @@ defineExpose({ getFormRuleRef });
               checkStrictly: true
             }"
             clearable
+            default-expand-all
             placeholder="请选择当前责任人"
           />
         </el-form-item>
-      </re-col>
+      </re-col> -->
 
       <!-- <re-col :value="8">
         <el-form-item label="项目组">
@@ -255,11 +255,10 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <!-- <re-col :value="8">
+      <re-col :value="8">
         <el-form-item label="POC人员" prop="poc">
           <el-select
             class="w-full"
-            :disabled="isDisabled"
             v-model="newFormInline.poc"
             placeholder="请选择POC人员"
             clearable
@@ -273,9 +272,9 @@ defineExpose({ getFormRuleRef });
             />
           </el-select>
         </el-form-item>
-      </re-col> -->
+      </re-col>
 
-      <re-col :value="8">
+      <!-- <re-col :value="8">
         <el-form-item label="POC人员" prop="poc">
           <el-tree-select
             class="w-full"
@@ -290,10 +289,11 @@ defineExpose({ getFormRuleRef });
               checkStrictly: true
             }"
             clearable
+            default-expand-all
             placeholder="请选择POC人员"
           />
         </el-form-item>
-      </re-col>
+      </re-col> -->
 
       <re-col :value="8">
         <el-form-item label="运维" prop="op">

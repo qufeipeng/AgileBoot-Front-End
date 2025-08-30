@@ -61,7 +61,7 @@ export const exportPocExcelApi = (params: PocListCommand, fileName: string) => {
 };
 
 export interface AddPocCommand {
-  owner: number;
+  owner: string;
   status: string;
   customer: string;
   project: string;
@@ -71,7 +71,7 @@ export interface AddPocCommand {
   done: string;
   sales: string;
   sa: string;
-  poc: number;
+  poc: string;
   op: string;
   kv: string;
   pocStartDt: Date;

@@ -91,6 +91,17 @@ export const getUserListApi = (params?: UserQuery) => {
   });
 };
 
+/** 获取用户列表 */
+export const getUserList2Api = (params?: UserQuery) => {
+  return http.request<ResponseData<PageDTO<UserDTO>>>(
+    "get",
+    "/system/users/list",
+    {
+      params
+    }
+  );
+};
+
 /** 新增用户 */
 export const addUserApi = (data?: UserRequest) => {
   return http.request<ResponseData<void>>("post", "/system/users", {

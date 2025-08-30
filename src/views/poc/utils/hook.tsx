@@ -5,9 +5,9 @@ import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, toRaw, h } from "vue";
 import { CommonUtils } from "@/utils/common";
 import { addDialog } from "@/components/ReDialog";
-import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
-import { getDeptAndUserListApi } from "@/api/system/dept";
-//import { getUserListApi } from "@/api/system/user";
+//import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
+//import { getDeptAndUserListApi } from "@/api/system/dept";
+import { getUserList2Api } from "@/api/system/user";
 import { getDictListApi } from "@/api/dict";
 import {
   PocListCommand,
@@ -43,9 +43,9 @@ export function useHook() {
     background: true
   });
 
-  const deptTreeList = ref([]);
+  //const deptTreeList = ref([]);
 
-  //const userList = ref([]);
+  const userList = ref([]);
 
   const status = ref([]);
 
@@ -130,12 +130,12 @@ export function useHook() {
       prop: "sa",
       minWidth: 100
     },
-    {
-      label: "POC人员ID",
-      prop: "poc",
-      minWidth: 100,
-      hide: true
-    },
+    // {
+    //   label: "POC人员ID",
+    //   prop: "poc",
+    //   minWidth: 100,
+    //   hide: true
+    // },
     {
       label: "POC人员",
       prop: "pocUsername",
@@ -311,7 +311,7 @@ export function useHook() {
       title: `${title}POC`,
       props: {
         formInline: {
-          pocId: row?.pocId ?? 0,
+          pocId: row?.pocId ?? -1,
           owner: row?.owner ?? useUserStoreHook().userId,
           status: row?.status ?? "",
           customer: row?.customer ?? "",
@@ -322,7 +322,7 @@ export function useHook() {
           done: row?.done ?? "",
           sales: row?.sales ?? "",
           sa: row?.sa ?? "",
-          poc: row?.poc ?? useUserStoreHook().userId,
+          poc: row?.poc ?? "",
           op: row?.op ?? "",
           kv: row?.kv ?? "",
           pocStartDt: row?.pocStartDt ?? undefined,
@@ -343,8 +343,8 @@ export function useHook() {
         //deptOptions: deptTreeList,
         statusOptions: status,
         riskOptions: risks,
-        //userOptions: userList,
-        userOptions: deptTreeList,
+        userOptions: userList,
+        //userOptions: deptTreeList,
         provinceOptions: provinces,
         industryOptions: industrys,
         deploymentOptions: deployments,
@@ -400,14 +400,14 @@ export function useHook() {
   onMounted(async () => {
     onSearch();
 
-    const deptResponse = await getDeptAndUserListApi({});
-    deptTreeList.value = await setDisabledForTreeOptions(
-      handleTree(deptResponse.data),
-      "status"
-    );
+    // const deptResponse = await getDeptAndUserListApi({});
+    // deptTreeList.value = await setDisabledForTreeOptions(
+    //   handleTree(deptResponse.data),
+    //   "status"
+    // );
 
-    //const userResponse = await getUserListApi({});
-    //userList.value = userResponse.data.rows;
+    const userResponse = await getUserList2Api({});
+    userList.value = userResponse.data.rows;
 
     const statusResponse = await getDictListApi("status");
     status.value = statusResponse.data;
@@ -443,6 +443,6 @@ export function useHook() {
     handleDelete,
     status,
     risks,
-    deptTreeList
+    userList
   };
 }
