@@ -14,6 +14,7 @@ interface FormProps {
   industryOptions: any[];
   deploymentOptions: any[];
   compatibilityOptions: any[];
+  pluginsOptions: any[];
   //isDisabled: any;
 }
 
@@ -55,7 +56,8 @@ const props = withDefaults(defineProps<FormProps>(), {
   provinceOptions: () => [],
   industryOptions: () => [],
   deploymentOptions: () => [],
-  compatibilityOptions: () => []
+  compatibilityOptions: () => [],
+  pluginsOptions: () => []
   //isDisabled: false
 });
 
@@ -68,6 +70,7 @@ const provinceOptions = ref(props.provinceOptions);
 const industryOptions = ref(props.industryOptions);
 const deploymentOptions = ref(props.deploymentOptions);
 const compatibilityOptions = ref(props.compatibilityOptions);
+const pluginsOptions = ref(props.pluginsOptions);
 
 const formRuleRef = ref();
 
@@ -498,7 +501,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <!-- <re-col :value="8">
+      <re-col :value="24">
         <el-form-item label="相关组件" prop="plugins">
           <el-select
             class="w-full"
@@ -507,16 +510,17 @@ defineExpose({ getFormRuleRef });
             multiple
             clearable
           >
-            <el-option label="YCM" value="0"> </el-option>
-            <el-option label="YMP" value="1"> </el-option>
-            <el-option label="GIS" value="2"> </el-option>
-            <el-option label="YDS" value="3"> </el-option>
-            <el-option label="YDC" value="4"> </el-option>
+            <el-option
+              v-for="item in pluginsOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
           </el-select>
         </el-form-item>
-      </re-col>       -->
+      </re-col>
 
-      <re-col :value="8">
+      <!-- <re-col :value="8">
         <el-form-item label="相关组件" prop="plugins">
           <el-input
             v-model="newFormInline.plugins"
@@ -524,7 +528,7 @@ defineExpose({ getFormRuleRef });
             placeholder="请输入相关组件"
           />
         </el-form-item>
-      </re-col>
+      </re-col> -->
 
       <re-col :value="24">
         <el-form-item label="备注" prop="notes">

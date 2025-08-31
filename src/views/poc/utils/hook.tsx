@@ -59,6 +59,8 @@ export function useHook() {
 
   const provinces = ref([]);
 
+  const plugins = ref([]);
+
   //const isDisabled = ref(false);
   //isDisabled.value = useUserStoreHook().roles[0] != "admin";
 
@@ -156,28 +158,32 @@ export function useHook() {
       minWidth: 100,
       prop: "pocStartDt",
       sortable: "custom",
-      formatter: ({ pocStartDt }) => dayjs(pocStartDt).format("YYYY-MM-DD")
+      formatter: ({ pocStartDt }) =>
+        pocStartDt ? dayjs(pocStartDt).format("YYYY-MM-DD") : ""
     },
     {
       label: "POC完成日期",
       minWidth: 100,
       prop: "pocEndDt",
       sortable: "custom",
-      formatter: ({ pocEndDt }) => dayjs(pocEndDt).format("YYYY-MM-DD")
+      formatter: ({ pocEndDt }) =>
+        pocEndDt ? dayjs(pocEndDt).format("YYYY-MM-DD") : ""
     },
     {
       label: "上线日期",
       minWidth: 100,
       prop: "onlineDt",
       sortable: "custom",
-      formatter: ({ onlineDt }) => dayjs(onlineDt).format("YYYY-MM-DD")
+      formatter: ({ onlineDt }) =>
+        onlineDt ? dayjs(onlineDt).format("YYYY-MM-DD") : ""
     },
     {
       label: "最后更新日期",
       minWidth: 100,
       prop: "lastUpdDt",
       sortable: "custom",
-      formatter: ({ lastUpdDt }) => dayjs(lastUpdDt).format("YYYY-MM-DD")
+      formatter: ({ lastUpdDt }) =>
+        lastUpdDt ? dayjs(lastUpdDt).format("YYYY-MM-DD") : ""
     },
     {
       label: "省份",
@@ -220,7 +226,7 @@ export function useHook() {
     },
     {
       label: "相关组件",
-      prop: "plugins",
+      prop: "pluginsName",
       minWidth: 100
     },
     {
@@ -239,7 +245,7 @@ export function useHook() {
       prop: "createTime",
       sortable: "custom",
       formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+        createTime ? dayjs(createTime).format("YYYY-MM-DD HH:mm:ss") : ""
     },
     {
       label: "更新者",
@@ -252,7 +258,7 @@ export function useHook() {
       prop: "updateTime",
       sortable: "custom",
       formatter: ({ updateTime }) =>
-        dayjs(updateTime).format("YYYY-MM-DD HH:mm:ss")
+        updateTime ? dayjs(updateTime).format("YYYY-MM-DD HH:mm:ss") : ""
     },
     {
       label: "操作",
@@ -268,6 +274,7 @@ export function useHook() {
   }
 
   async function handleAdd(row, done) {
+    row.plugins = row.plugins.join(",");
     await addPocApi(row as UpdatePocCommand).then(() => {
       message(`您新增了POC${row.project}的这条数据`, {
         type: "success"
@@ -280,6 +287,7 @@ export function useHook() {
   }
 
   async function handleUpdate(row, done) {
+    row.plugins = row.plugins.join(",");
     await updatePocApi(row.pocId, row as UpdatePocCommand).then(() => {
       message(`您修改了POC${row.project}的这条数据`, {
         type: "success"
@@ -336,7 +344,7 @@ export function useHook() {
           version: row?.version ?? "",
           deployment: row?.deployment ?? "",
           compatibility: row?.compatibility ?? "",
-          plugins: row?.plugins ?? "",
+          plugins: row?.plugins?.split(",") ?? "",
           notes: row?.notes ?? ""
           //deptId: row?.deptId ?? useUserStoreHook().deptId
         },
@@ -348,7 +356,8 @@ export function useHook() {
         provinceOptions: provinces,
         industryOptions: industrys,
         deploymentOptions: deployments,
-        compatibilityOptions: compatibilitys
+        compatibilityOptions: compatibilitys,
+        pluginsOptions: plugins
         //isDisabled: isDisabled
       },
 
@@ -426,6 +435,9 @@ export function useHook() {
 
     const provincesResponse = await getDictListApi("province");
     provinces.value = provincesResponse.data;
+
+    const pluginsResponse = await getDictListApi("plugins");
+    plugins.value = pluginsResponse.data;
   });
 
   return {
