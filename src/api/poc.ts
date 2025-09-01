@@ -1,12 +1,19 @@
 import { http } from "@/utils/http";
 
 export interface PocListCommand extends BasePageQuery {
+  pocId?: number;
   customer?: string;
   project?: string;
   status?: string;
   owner?: number;
   poc?: number;
   risk?: string;
+  beginPocStartDt?: string;
+  endPocStartDt?: string;
+  beginPocEndDt?: string;
+  endPocEndDt?: string;
+  beginOnlineDt?: string;
+  endOnlineDt?: string;
 }
 
 export interface PocPageResponse {

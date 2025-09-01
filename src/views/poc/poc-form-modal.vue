@@ -219,26 +219,6 @@ defineExpose({ getFormRuleRef });
       </re-col>
 
       <re-col :value="8">
-        <el-form-item label="待处理&风险描述" prop="todoRisk">
-          <el-input
-            v-model="newFormInline.todoRisk"
-            clearable
-            placeholder="请输入待处理&风险描述"
-          />
-        </el-form-item>
-      </re-col>
-
-      <re-col :value="8">
-        <el-form-item label="已完成进展" prop="done">
-          <el-input
-            v-model="newFormInline.done"
-            clearable
-            placeholder="请输入进展"
-          />
-        </el-form-item>
-      </re-col>
-
-      <re-col :value="8">
         <el-form-item label="销售" prop="sales">
           <el-input
             v-model="newFormInline.sales"
@@ -501,7 +481,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="24">
+      <re-col :value="8">
         <el-form-item label="相关组件" prop="plugins">
           <el-select
             class="w-full"
@@ -520,6 +500,16 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
+      <re-col :value="8">
+        <el-form-item label="备注" prop="notes">
+          <el-input
+            v-model="newFormInline.notes"
+            clearable
+            placeholder="请输入备注内容"
+          />
+        </el-form-item>
+      </re-col>
+
       <!-- <re-col :value="8">
         <el-form-item label="相关组件" prop="plugins">
           <el-input
@@ -531,13 +521,25 @@ defineExpose({ getFormRuleRef });
       </re-col> -->
 
       <re-col :value="24">
-        <el-form-item label="备注" prop="notes">
+        <el-form-item label="待处理&风险描述" prop="todoRisk">
           <el-input
-            v-model="newFormInline.notes"
+            v-model="newFormInline.todoRisk"
             clearable
-            placeholder="请输入备注内容"
-            rows="3"
+            placeholder="请输入待处理&风险描述"
             type="textarea"
+            rows="6"
+          />
+        </el-form-item>
+      </re-col>
+
+      <re-col :value="24">
+        <el-form-item label="已完成进展" prop="done">
+          <el-input
+            v-model="newFormInline.done"
+            clearable
+            placeholder="请输入进展"
+            type="textarea"
+            rows="6"
           />
         </el-form-item>
       </re-col>

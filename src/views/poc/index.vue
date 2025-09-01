@@ -10,10 +10,13 @@ import Download from "@iconify-icons/ep/download";
 import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
+import { CommonUtils } from "@/utils/common";
 
 defineOptions({
   name: "Poc"
 });
+
+const tableRef = ref();
 
 const formRef = ref();
 const {
@@ -24,19 +27,33 @@ const {
   pagination,
   onSearch,
   resetForm,
+  pocStartDtTimeRange,
+  pocEndDtTimeRange,
+  onlineDtTimeRange,
+  defaultSort,
+  onSortChanged,
   exportAllExcel,
   handleDelete,
   openDialog,
-  getList,
+  getPocList,
   status,
   risks,
   userList
 } = useHook();
 
 watch(
-  () => searchFormParams.project,
+  //() => searchFormParams.pocId,
+  [
+    () => searchFormParams.pocId,
+    () => searchFormParams.customer,
+    () => searchFormParams.project,
+    () => searchFormParams.owner,
+    () => searchFormParams.poc,
+    () => searchFormParams.status,
+    () => searchFormParams.risk
+  ],
   () => {
-    onSearch();
+    onSearch(tableRef);
   }
 );
 </script>
@@ -49,6 +66,14 @@ watch(
       :model="searchFormParams"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
+      <el-form-item label="POC编号" prop="pocId">
+        <el-input
+          v-model="searchFormParams.pocId"
+          placeholder="请输入POC编号"
+          clearable
+          class="!w-[200px]"
+        />
+      </el-form-item>
       <el-form-item label="客户" prop="customer">
         <el-input
           v-model="searchFormParams.customer"
@@ -161,17 +186,52 @@ watch(
           />
         </el-select>
       </el-form-item>
-
+      <el-form-item label="开始日期" prop="pocStartDt">
+        <el-date-picker
+          class="!w-[240px]"
+          v-model="pocStartDtTimeRange"
+          value-format="YYYY-MM-DD"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        />
+      </el-form-item>
+      <el-form-item label="完成日期" prop="pocEndDt">
+        <el-date-picker
+          class="!w-[240px]"
+          v-model="pocEndDtTimeRange"
+          value-format="YYYY-MM-DD"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        />
+      </el-form-item>
+      <el-form-item label="上线日期" prop="OnlineDt">
+        <el-date-picker
+          class="!w-[240px]"
+          v-model="onlineDtTimeRange"
+          value-format="YYYY-MM-DD"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        />
+      </el-form-item>
       <el-form-item>
         <el-button
           type="primary"
           :icon="useRenderIcon(Search)"
           :loading="pageLoading"
-          @click="onSearch"
+          @click="onSearch(tableRef)"
         >
           搜索
         </el-button>
-        <el-button :icon="useRenderIcon(Refresh)" @click="resetForm(formRef)">
+        <el-button
+          :icon="useRenderIcon(Refresh)"
+          @click="resetForm(formRef, tableRef)"
+        >
           重置
         </el-button>
       </el-form-item>
@@ -187,16 +247,22 @@ watch(
           新增POC
         </el-button>
         <el-button
+          type="primary"
+          @click="CommonUtils.exportExcel(columns, dataList, 'POC列表')"
+          >单页导出</el-button
+        >
+        <el-button
           type="warning"
           :icon="useRenderIcon(Download)"
           @click="exportAllExcel"
         >
-          导出
+          全部导出
         </el-button>
       </template>
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
           border
+          ref="tableRef"
           adaptive
           align-whole="center"
           table-layout="auto"
@@ -204,14 +270,16 @@ watch(
           :size="size"
           :data="dataList"
           :columns="dynamicColumns"
+          :default-sort="defaultSort"
           :pagination="pagination"
           :paginationSmall="size === 'small' ? true : false"
           :header-cell-style="{
             background: 'var(--el-table-row-hover-bg-color)',
             color: 'var(--el-text-color-primary)'
           }"
-          @page-size-change="getList"
-          @page-current-change="getList"
+          @page-size-change="getPocList"
+          @page-current-change="getPocList"
+          @sort-change="onSortChanged"
         >
           <template #operation="{ row }">
             <el-button
