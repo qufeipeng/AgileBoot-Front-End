@@ -38,7 +38,8 @@ const {
   getPocList,
   status,
   risks,
-  userList
+  userList,
+  onWatch
 } = useHook();
 
 watch(
@@ -50,10 +51,16 @@ watch(
     () => searchFormParams.owner,
     () => searchFormParams.poc,
     () => searchFormParams.status,
-    () => searchFormParams.risk
+    () => searchFormParams.risk,
+    () => searchFormParams.beginPocStartDt,
+    () => searchFormParams.endPocStartDt,
+    () => searchFormParams.beginPocEndDt,
+    () => searchFormParams.endPocEndDt,
+    () => searchFormParams.beginOnlineDt,
+    () => searchFormParams.endOnlineDt
   ],
   () => {
-    onSearch(tableRef);
+    onWatch();
   }
 );
 </script>

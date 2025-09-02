@@ -428,6 +428,12 @@ export function useHook() {
     getPocList();
   }
 
+  async function onWatch() {
+    // 点击搜索的时候 需要重置分页
+    pagination.currentPage = 1;
+    getPocList();
+  }
+
   async function onSearch(tableRef) {
     // 点击搜索的时候 需要重置分页
     //pagination.currentPage = 1;
@@ -593,6 +599,7 @@ export function useHook() {
     handleDelete,
     status,
     risks,
-    userList
+    userList,
+    onWatch
   };
 }
