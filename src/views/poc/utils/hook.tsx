@@ -146,7 +146,7 @@ export function useHook() {
     {
       label: "POC编号",
       prop: "pocId",
-      minWidth: 80
+      minWidth: 130
     },
     {
       label: "项目组",
@@ -555,7 +555,7 @@ export function useHook() {
     // );
 
     const userResponse = await getUserList2Api({});
-    userList.value = userResponse.data.rows;
+    userList.value = userResponse.data;
 
     const statusResponse = await getDictListApi("status");
     status.value = statusResponse.data;

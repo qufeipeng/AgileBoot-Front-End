@@ -91,9 +91,9 @@ export const getUserListApi = (params?: UserQuery) => {
   });
 };
 
-/** 获取用户列表 */
+/** 不分页获取用户列表 */
 export const getUserList2Api = (params?: UserQuery) => {
-  return http.request<ResponseData<PageDTO<UserDTO>>>(
+  return http.request<ResponseData<Array<UserDTO>>>(
     "get",
     "/system/users/list",
     {

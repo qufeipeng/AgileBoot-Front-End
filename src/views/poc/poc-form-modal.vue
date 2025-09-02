@@ -527,7 +527,7 @@ defineExpose({ getFormRuleRef });
             clearable
             placeholder="请输入待处理&风险描述"
             type="textarea"
-            rows="6"
+            rows="5"
           />
         </el-form-item>
       </re-col>
@@ -539,7 +539,7 @@ defineExpose({ getFormRuleRef });
             clearable
             placeholder="请输入进展"
             type="textarea"
-            rows="6"
+            rows="5"
           />
         </el-form-item>
       </re-col>
