@@ -4,6 +4,7 @@ export interface PocListCommand extends BasePageQuery {
   pocId?: number;
   customer?: string;
   project?: string;
+  deptId?: string;
   status?: string;
   owner?: number;
   poc?: number;

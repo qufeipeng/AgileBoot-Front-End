@@ -92,13 +92,21 @@ export const getUserListApi = (params?: UserQuery) => {
 };
 
 /** 不分页获取用户列表 */
-export const getUserList2Api = (params?: UserQuery) => {
+export const getUserListByQueryApi = (params?: UserQuery) => {
   return http.request<ResponseData<Array<UserDTO>>>(
     "get",
-    "/system/users/list",
+    "/system/users/listByQuery",
     {
       params
     }
+  );
+};
+
+/** 不分页获取所有用户列表 */
+export const getUserListAllApi = () => {
+  return http.request<ResponseData<Array<UserDTO>>>(
+    "get",
+    "/system/users/list"
   );
 };
 

@@ -39,6 +39,8 @@ const {
   status,
   risks,
   userList,
+  userListAll,
+  deptTreeList,
   onWatch
 } = useHook();
 
@@ -48,6 +50,7 @@ watch(
     () => searchFormParams.pocId,
     () => searchFormParams.customer,
     () => searchFormParams.project,
+    () => searchFormParams.deptId,
     () => searchFormParams.owner,
     () => searchFormParams.poc,
     () => searchFormParams.status,
@@ -97,6 +100,23 @@ watch(
           class="!w-[200px]"
         />
       </el-form-item>
+      <el-form-item label="项目组" prop="deptId">
+        <el-tree-select
+          class="w-full"
+          v-model="searchFormParams.deptId"
+          :data="deptTreeList"
+          :show-all-levels="false"
+          value-key="id"
+          :props="{
+            value: 'id',
+            label: 'deptName',
+            emitPath: false,
+            checkStrictly: true
+          }"
+          clearable
+          placeholder="请选择项目组"
+        />
+      </el-form-item>
       <el-form-item label="当前责任人" prop="owner">
         <el-select
           v-model="searchFormParams.owner"
@@ -138,7 +158,7 @@ watch(
           class="!w-[180px]"
         >
           <el-option
-            v-for="item in userList"
+            v-for="item in userListAll"
             :key="item.userId"
             :label="item.nickname"
             :value="item.userId"

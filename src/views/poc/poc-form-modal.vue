@@ -10,6 +10,7 @@ interface FormProps {
   statusOptions: any[];
   riskOptions: any[];
   userOptions: any[];
+  userAllOptions: any[];
   provinceOptions: any[];
   industryOptions: any[];
   deploymentOptions: any[];
@@ -53,6 +54,7 @@ const props = withDefaults(defineProps<FormProps>(), {
   statusOptions: () => [],
   riskOptions: () => [],
   userOptions: () => [],
+  userAllOptions: () => [],
   provinceOptions: () => [],
   industryOptions: () => [],
   deploymentOptions: () => [],
@@ -66,6 +68,7 @@ const newFormInline = ref(props.formInline);
 const statusOptions = ref(props.statusOptions);
 const riskOptions = ref(props.riskOptions);
 const userOptions = ref(props.userOptions);
+const userAllOptions = ref(props.userAllOptions);
 const provinceOptions = ref(props.provinceOptions);
 const industryOptions = ref(props.industryOptions);
 const deploymentOptions = ref(props.deploymentOptions);
@@ -247,7 +250,7 @@ defineExpose({ getFormRuleRef });
             clearable
           >
             <el-option
-              v-for="item in userOptions"
+              v-for="item in userAllOptions"
               :key="item.userId"
               :label="item.nickname"
               :value="item.userId"
@@ -428,12 +431,31 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col> -->
 
+      <!-- <re-col :value="8">
+        <el-form-item label="部署形态" prop="deployment">
+          <el-select
+            class="w-full"
+            v-model="newFormInline.deployment"
+            placeholder="请选择部署形态"
+            clearable
+          >
+            <el-option
+              v-for="item in deploymentOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+      </re-col> -->
+
       <re-col :value="8">
         <el-form-item label="部署形态" prop="deployment">
           <el-select
             class="w-full"
             v-model="newFormInline.deployment"
             placeholder="请选择部署形态"
+            multiple
             clearable
           >
             <el-option

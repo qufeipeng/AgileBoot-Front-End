@@ -6,9 +6,9 @@ import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, toRaw, h, computed } from "vue";
 import { CommonUtils } from "@/utils/common";
 import { addDialog } from "@/components/ReDialog";
-//import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
-//import { getDeptAndUserListApi } from "@/api/system/dept";
-import { getUserList2Api } from "@/api/system/user";
+import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
+import { getDeptListApi } from "@/api/system/dept";
+import { getUserListByQueryApi, getUserListAllApi } from "@/api/system/user";
 import { getDictListApi } from "@/api/dict";
 import {
   PocListCommand,
@@ -32,6 +32,7 @@ export function useHook() {
     pocId: undefined,
     customer: undefined,
     project: undefined,
+    deptId: undefined,
     status: undefined,
     owner: undefined,
     poc: undefined,
@@ -117,9 +118,11 @@ export function useHook() {
 
   const sortState = ref<Sort>(defaultSort);
 
-  //const deptTreeList = ref([]);
+  const deptTreeList = ref([]);
 
   const userList = ref([]);
+
+  const userListAll = ref([]);
 
   const status = ref([]);
 
@@ -389,6 +392,7 @@ export function useHook() {
 
   async function handleAdd(row, done) {
     row.plugins = row.plugins.join(",");
+    row.deployment = row.deployment.join(",");
     await addPocApi(row as UpdatePocCommand).then(() => {
       message(`您新增了POC${row.project} 的这条数据`, {
         type: "success"
@@ -402,6 +406,7 @@ export function useHook() {
 
   async function handleUpdate(row, done) {
     row.plugins = row.plugins.join(",");
+    row.deployment = row.deployment.join(",");
     await updatePocApi(row.pocId, row as UpdatePocCommand).then(() => {
       message(`您修改了POC${row.project} 的这条数据`, {
         type: "success"
@@ -471,7 +476,7 @@ export function useHook() {
           isv: row?.isv ?? "",
           maintenance: row?.maintenance ?? "",
           version: row?.version ?? "",
-          deployment: row?.deployment ?? "",
+          deployment: row?.deployment?.split(",") ?? "",
           compatibility: row?.compatibility ?? "",
           plugins: row?.plugins?.split(",") ?? "",
           notes: row?.notes ?? ""
@@ -481,6 +486,7 @@ export function useHook() {
         statusOptions: status,
         riskOptions: risks,
         userOptions: userList,
+        userAllOptions: userListAll,
         //userOptions: deptTreeList,
         provinceOptions: provinces,
         industryOptions: industrys,
@@ -548,14 +554,17 @@ export function useHook() {
     //onSearch();
     getPocList();
 
-    // const deptResponse = await getDeptAndUserListApi({});
-    // deptTreeList.value = await setDisabledForTreeOptions(
-    //   handleTree(deptResponse.data),
-    //   "status"
-    // );
+    const deptResponse = await getDeptListApi({});
+    deptTreeList.value = await setDisabledForTreeOptions(
+      handleTree(deptResponse.data),
+      "status"
+    );
 
-    const userResponse = await getUserList2Api({});
+    const userResponse = await getUserListByQueryApi({});
     userList.value = userResponse.data;
+
+    const userAllResponse = await getUserListAllApi();
+    userListAll.value = userAllResponse.data;
 
     const statusResponse = await getDictListApi("status");
     status.value = statusResponse.data;
@@ -600,6 +609,8 @@ export function useHook() {
     status,
     risks,
     userList,
+    userListAll,
+    deptTreeList,
     onWatch
   };
 }
