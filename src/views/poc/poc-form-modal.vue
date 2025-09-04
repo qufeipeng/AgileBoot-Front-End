@@ -47,8 +47,8 @@ const props = withDefaults(defineProps<FormProps>(), {
     deployment: "",
     compatibility: "",
     plugins: "",
-    notes: "",
-    deptId: 0
+    notes: ""
+    //deptId: 0
   }),
   //deptOptions: () => [],
   statusOptions: () => [],
@@ -233,11 +233,20 @@ defineExpose({ getFormRuleRef });
 
       <re-col :value="8">
         <el-form-item label="售前" prop="sa">
-          <el-input
+          <el-select
+            class="w-full"
             v-model="newFormInline.sa"
+            placeholder="请选择售前"
             clearable
-            placeholder="请输入售前"
-          />
+          >
+            <el-option
+              v-for="item in userAllOptions"
+              :key="item.userId"
+              :label="item.nickname"
+              :value="item.userId"
+              :disabled="item.status == 0"
+            />
+          </el-select>
         </el-form-item>
       </re-col>
 

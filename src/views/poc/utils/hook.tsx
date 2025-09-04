@@ -208,7 +208,7 @@ export function useHook() {
     },
     {
       label: "售前",
-      prop: "sa",
+      prop: "saUsername",
       minWidth: 100
     },
     // {
@@ -387,7 +387,7 @@ export function useHook() {
     CommonUtils.fillTimeRangeParams(searchFormParams, pocEndDtTimeRange.value);
     CommonUtils.fillTimeRangeParams(searchFormParams, onlineDtTimeRange.value);
 
-    exportPocExcelApi(toRaw(searchFormParams), "POC列表.xlsx");
+    exportPocExcelApi(toRaw(searchFormParams), "POC项目列表.xlsx");
   }
 
   async function handleAdd(row, done) {

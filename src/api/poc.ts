@@ -25,10 +25,10 @@ export interface PocPageResponse {
   project: string;
   progress: number;
   risk: string;
-  todo_risk: string;
+  todoRisk: string;
   done: string;
   sales: string;
-  sa: string;
+  saUsername: string;
   pocUsername: string;
   op: string;
   kv: string;
