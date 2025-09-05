@@ -60,7 +60,7 @@ export const addWorkTimeApi = (data: AddWorkTimeCommand) => {
 };
 
 export interface UpdateWorkTimeCommand extends AddWorkTimeCommand {
-  pocId: number;
+  workTimeId: number;
 }
 
 export const deleteWorkTimeApi = (workTimeId: number) => {
