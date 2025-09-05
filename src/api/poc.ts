@@ -19,16 +19,21 @@ export interface PocListCommand extends BasePageQuery {
 
 export interface PocPageResponse {
   pocId: number;
+  owner: number;
   ownerUsername: string;
   status: string;
+  statusName: string;
   customer: string;
   project: string;
   progress: number;
   risk: string;
+  riskName: string;
   todoRisk: string;
   done: string;
   sales: string;
+  sa: number;
   saUsername: string;
+  poc: number;
   pocUsername: string;
   op: string;
   kv: string;
@@ -37,14 +42,19 @@ export interface PocPageResponse {
   onlineDt: Date;
   lastUpdDt: Date;
   province: string;
+  provinceName: string;
   industry: string;
+  industryName: string;
   isv: string;
   maintenance: string;
   version: string;
   deployment: string;
+  deploymentName: string;
   compatibility: string;
   plugins: string;
+  pluginsName: string;
   notes: string;
+  deptId: number;
   deptName: string;
   creatorName: string;
   createTime: Date;
