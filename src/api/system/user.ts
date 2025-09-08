@@ -92,10 +92,10 @@ export const getUserListApi = (params?: UserQuery) => {
 };
 
 /** 不分页获取用户列表 */
-export const getUserListByQueryApi = (params?: UserQuery) => {
+export const getUserListNoPageApi = (params?: UserQuery) => {
   return http.request<ResponseData<Array<UserDTO>>>(
     "get",
-    "/system/users/listByQuery",
+    "/system/users/listNoPage",
     {
       params
     }

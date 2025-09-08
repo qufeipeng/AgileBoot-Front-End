@@ -8,7 +8,7 @@ import { CommonUtils } from "@/utils/common";
 import { addDialog } from "@/components/ReDialog";
 import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
 import { getDeptListApi } from "@/api/system/dept";
-import { getUserListByQueryApi, getUserListAllApi } from "@/api/system/user";
+import { getUserListNoPageApi, getUserListAllApi } from "@/api/system/user";
 import { getDictListApi } from "@/api/dict";
 import {
   PocListCommand,
@@ -17,7 +17,8 @@ import {
   deletePocApi,
   addPocApi,
   updatePocApi,
-  UpdatePocCommand
+  UpdatePocCommand,
+  getPocListNoPageApi
 } from "@/api/poc";
 import { useUserStoreHook } from "@/store/modules/user";
 
@@ -117,6 +118,8 @@ export function useHook() {
   });
 
   const sortState = ref<Sort>(defaultSort);
+
+  const pocList = ref([]);
 
   const deptTreeList = ref([]);
 
@@ -554,17 +557,20 @@ export function useHook() {
     //onSearch();
     getPocList();
 
+    const pocListNoPageResponse = await getPocListNoPageApi({});
+    pocList.value = pocListNoPageResponse.data;
+
     const deptResponse = await getDeptListApi({});
     deptTreeList.value = await setDisabledForTreeOptions(
       handleTree(deptResponse.data),
       "status"
     );
 
-    const userResponse = await getUserListByQueryApi({});
-    userList.value = userResponse.data;
+    const userListNoPAgeResponse = await getUserListNoPageApi({});
+    userList.value = userListNoPAgeResponse.data;
 
-    const userAllResponse = await getUserListAllApi();
-    userListAll.value = userAllResponse.data;
+    const userListAllResponse = await getUserListAllApi();
+    userListAll.value = userListAllResponse.data;
 
     const statusResponse = await getDictListApi("status");
     status.value = statusResponse.data;
@@ -611,6 +617,7 @@ export function useHook() {
     userList,
     userListAll,
     deptTreeList,
+    pocList,
     onWatch
   };
 }

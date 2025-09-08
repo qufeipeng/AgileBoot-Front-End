@@ -72,13 +72,20 @@ export function getPocListApi(params: PocListCommand) {
   );
 }
 
-export function getPocListAllApi(params: PocListCommand) {
+export function getPocListNoPageApi(params: PocListCommand) {
   return http.request<ResponseData<Array<PocPageResponse>>>(
     "get",
-    "/poc/listAll",
+    "/poc/listNoPage",
     {
       params
     }
+  );
+}
+
+export function getPocListAllApi() {
+  return http.request<ResponseData<Array<PocPageResponse>>>(
+    "get",
+    "/poc/listAll"
   );
 }
 

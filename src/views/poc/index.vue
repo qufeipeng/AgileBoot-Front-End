@@ -41,6 +41,7 @@ const {
   userList,
   userListAll,
   deptTreeList,
+  pocList,
   onWatch
 } = useHook();
 
@@ -76,14 +77,14 @@ watch(
       :model="searchFormParams"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="POC编号" prop="pocId">
+      <!-- <el-form-item label="POC编号" prop="pocId">
         <el-input
           v-model="searchFormParams.pocId"
           placeholder="请输入POC编号"
           clearable
           class="!w-[200px]"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="客户" prop="customer">
         <el-input
           v-model="searchFormParams.customer"
@@ -93,12 +94,20 @@ watch(
         />
       </el-form-item>
       <el-form-item label="项目名称" prop="project">
-        <el-input
-          v-model="searchFormParams.project"
+        <el-select
+          v-model="searchFormParams.pocId"
           placeholder="请选择项目名称"
           clearable
+          filterable
           class="!w-[200px]"
-        />
+        >
+          <el-option
+            v-for="dict in pocList"
+            :key="dict.pocId"
+            :label="dict.project"
+            :value="dict.pocId"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="项目组" prop="deptId">
         <el-tree-select

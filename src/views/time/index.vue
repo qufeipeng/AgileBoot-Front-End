@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useHook } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
@@ -28,7 +28,6 @@ const {
   columns,
   dataList,
   pagination,
-  dateRange,
   defaultSort,
   multipleSelection,
   onSearch,
@@ -39,9 +38,13 @@ const {
   handleDelete,
   handleBulkDelete,
   hasSelectDate,
-  pocList
+  pocList,
+  userList,
+  deptTreeList,
+  onWatch
 } = useHook();
 
+const value1 = ref("");
 const opType = ref<"add" | "update">("add");
 const modalVisible = ref(false);
 const opRow = ref<WorkTimePageResponse>();
@@ -50,6 +53,17 @@ function openDialog(type: "add" | "update", row?: WorkTimePageResponse) {
   opRow.value = row;
   modalVisible.value = true;
 }
+
+watch(
+  [
+    () => searchFormParams.pocId,
+    () => searchFormParams.beginDate,
+    () => searchFormParams.endDate
+  ],
+  () => {
+    onWatch();
+  }
+);
 </script>
 
 <template>
@@ -61,25 +75,10 @@ function openDialog(type: "add" | "update", row?: WorkTimePageResponse) {
       :model="searchFormParams"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="项目名称" prop="project">
-        <el-select
-          v-model="searchFormParams.project"
-          placeholder="请选择项目名称"
-          clearable
-          class="!w-[180px]"
-        >
-          <el-option
-            v-for="dict in pocList"
-            :key="dict.pocId"
-            :label="dict.project"
-            :value="dict.pocId"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="周">
+      <el-form-item label="周" prop="beginDate">
         <el-date-picker
-          class="!w-[240px]"
-          v-model="dateRange"
+          class="!w-[300px]"
+          v-model="value1"
           type="week"
           :format="
             searchFormParams.beginDate +
@@ -92,6 +91,55 @@ function openDialog(type: "add" | "update", row?: WorkTimePageResponse) {
           placeholder="请选择日期"
           @change="hasSelectDate"
         />
+      </el-form-item>
+      <el-form-item label="项目名称" prop="pocId">
+        <el-select
+          v-model="searchFormParams.pocId"
+          placeholder="请选择项目名称"
+          clearable
+          filterable
+          class="!w-[300px]"
+        >
+          <el-option
+            v-for="dict in pocList"
+            :key="dict.pocId"
+            :label="dict.project"
+            :value="dict.pocId"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="项目组" prop="deptId">
+        <el-tree-select
+          class="w-full"
+          v-model="searchFormParams.deptId"
+          :data="deptTreeList"
+          :show-all-levels="false"
+          value-key="id"
+          :props="{
+            value: 'id',
+            label: 'deptName',
+            emitPath: false,
+            checkStrictly: true
+          }"
+          clearable
+          placeholder="请选择项目组"
+        />
+      </el-form-item>
+      <el-form-item label="姓名" prop="userId">
+        <el-select
+          v-model="searchFormParams.userId"
+          placeholder="请选择姓名"
+          clearable
+          class="!w-[180px]"
+        >
+          <el-option
+            v-for="item in userList"
+            :key="item.userId"
+            :label="item.nickname"
+            :value="item.userId"
+            :disabled="item.status == 0"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button

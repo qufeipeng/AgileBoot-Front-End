@@ -1,8 +1,7 @@
 import dayjs from "dayjs";
 import { message } from "@/utils/message";
 import { ElMessageBox, Sort } from "element-plus";
-import { reactive, ref, onMounted, toRaw, computed } from "vue";
-import { useUserStoreHook } from "@/store/modules/user";
+import { reactive, ref, onMounted, toRaw } from "vue";
 import { CommonUtils } from "@/utils/common";
 import { PaginationProps } from "@pureadmin/table";
 import {
@@ -12,12 +11,13 @@ import {
   deleteWorkTimeApi
 } from "@/api/time";
 import { getPocListAllApi } from "@/api/poc";
-
-const statusMap = useUserStoreHook().dictionaryMap["common.status"];
+import { handleTree, setDisabledForTreeOptions } from "@/utils/tree";
+import { getDeptListApi } from "@/api/system/dept";
+import { getUserListNoPageApi } from "@/api/system/user";
 
 export function useHook() {
   const defaultSort: Sort = {
-    prop: "createTime",
+    prop: "beginDate",
     //order: "ascending"
     order: "descending"
   };
@@ -29,33 +29,19 @@ export function useHook() {
     background: true
   };
 
-  const dateRange = computed<[string, string] | null>({
-    get() {
-      if (searchFormParams.beginDate && searchFormParams.endDate) {
-        return [searchFormParams.beginDate, searchFormParams.endDate];
-      } else {
-        return null;
-      }
-    },
-    set(v) {
-      if (v?.length === 2) {
-        searchFormParams.beginDate = v[0];
-        searchFormParams.endDate = v[1];
-      } else {
-        searchFormParams.beginDate = undefined;
-        searchFormParams.endDate = undefined;
-      }
-    }
-  });
-
   const searchFormParams = reactive<WorkTimeListCommand>({
-    beginDate: dayjs().format("YYYY-MM-DD"),
-    endDate: dayjs().format("YYYY-MM-DD"),
-    week: 0
+    pocId: undefined,
+    //beginDate: dayjs().format("YYYY-MM-DD"),
+    //endDate: dayjs().format("YYYY-MM-DD"),
+    beginDate: undefined,
+    endDate: undefined,
+    week: undefined
   });
 
   const dataList = ref([]);
   const pocList = ref([]);
+  const deptTreeList = ref([]);
+  const userList = ref([]);
   const pageLoading = ref(true);
   const multipleSelection = ref([]);
   const sortState = ref<Sort>(defaultSort);
@@ -66,39 +52,64 @@ export function useHook() {
       align: "left"
     },
     {
-      label: "岗位编号",
-      prop: "postId",
+      label: "工时编号",
+      prop: "workTimeId",
       minWidth: 100
     },
     {
-      label: "岗位编码",
-      prop: "postCode",
+      label: "姓名",
+      prop: "nickname",
       minWidth: 120
     },
     {
-      label: "岗位名称",
-      prop: "postName",
+      label: "项目组",
+      prop: "deptName",
+      minWidth: 80
+    },
+    {
+      label: "POC编号",
+      prop: "pocId",
+      //sortable: "custom",
+      minWidth: 80
+    },
+    {
+      label: "客户名称",
+      prop: "customer",
       minWidth: 120
     },
     {
-      label: "岗位排序",
-      prop: "postSort",
-      sortable: "custom",
-      minWidth: 120
+      label: "项目名称",
+      prop: "project",
+      minWidth: 200
     },
     {
-      label: "状态",
-      prop: "status",
+      label: "开始日期",
       minWidth: 120,
-      cellRenderer: ({ row, props }) => (
-        <el-tag
-          size={props.size}
-          type={statusMap[row.status].cssTag}
-          effect="plain"
-        >
-          {statusMap[row.status].label}
-        </el-tag>
-      )
+      prop: "beginDate",
+      sortable: "custom",
+      formatter: ({ beginDate }) => dayjs(beginDate).format("YYYY-MM-DD")
+    },
+    {
+      label: "结束日期",
+      minWidth: 120,
+      prop: "endDate",
+      sortable: "custom",
+      formatter: ({ endDate }) => dayjs(endDate).format("YYYY-MM-DD")
+    },
+    {
+      label: "周",
+      prop: "week",
+      minWidth: 60
+    },
+    {
+      label: "工时（小时）",
+      prop: "workHours",
+      minWidth: 100
+    },
+    {
+      label: "工作事项",
+      prop: "workContent",
+      minWidth: 120
     },
     {
       label: "创建时间",
@@ -107,6 +118,14 @@ export function useHook() {
       sortable: "custom",
       formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+    },
+    {
+      label: "修改时间",
+      minWidth: 160,
+      prop: "updateTime",
+      sortable: "custom",
+      formatter: ({ updateTime }) =>
+        dayjs(updateTime).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "操作",
@@ -143,10 +162,12 @@ export function useHook() {
 
   const getCurrentTime = (data, num) => {
     const date = new Date(data);
-    //const Y = date.getFullYear();
-    const M = date.getMonth() + 1;
+    const Y = date.getFullYear();
+    const M = date.getMonth();
     const D = date.getDate() + num;
-    return M + "." + D;
+    //return Y + '-'+ M + "-" + D;
+    //return new Date(Y, M, D);
+    return dayjs(new Date(Y, M, D)).format("YYYY-MM-DD");
   };
 
   function onSortChanged(sort: Sort) {
@@ -156,9 +177,15 @@ export function useHook() {
     getWorkTimeList();
   }
 
+  async function onWatch() {
+    // 点击搜索的时候 需要重置分页
+    pagination.currentPage = 1;
+    getWorkTimeList();
+  }
+
   async function onSearch(tableRef) {
     // 点击搜索的时候，需要重置排序，重新排序的时候会重置分页并发起查询请求
-    tableRef.getTableRef().sort("createTime", "ascending");
+    tableRef.getTableRef().sort("beginDate", "ascending");
   }
 
   function resetForm(formEl, tableRef) {
@@ -169,6 +196,7 @@ export function useHook() {
     // Form组件的resetFields方法无法清除datepicker里面的数据。
     searchFormParams.beginDate = undefined;
     searchFormParams.endDate = undefined;
+    searchFormParams.week = undefined;
     // 重置分页并查询
     onSearch(tableRef);
   }
@@ -192,7 +220,6 @@ export function useHook() {
       CommonUtils.fillSortParams(searchFormParams, sortState.value);
     }
     CommonUtils.fillPaginationParams(searchFormParams, pagination);
-    CommonUtils.fillTimeRangeParams(searchFormParams, dateRange.value);
 
     exportWorkTimeExcelApi(toRaw(searchFormParams), "岗位数据.xlsx");
   }
@@ -242,12 +269,20 @@ export function useHook() {
       });
   }
 
-  onMounted(getWorkTimeList);
   onMounted(async () => {
     getWorkTimeList();
 
     const pocAllResponse = await getPocListAllApi({});
     pocList.value = pocAllResponse.data;
+
+    const deptResponse = await getDeptListApi({});
+    deptTreeList.value = await setDisabledForTreeOptions(
+      handleTree(deptResponse.data),
+      "status"
+    );
+
+    const userListNoPageResponse = await getUserListNoPageApi({});
+    userList.value = userListNoPageResponse.data;
   });
 
   return {
@@ -257,7 +292,6 @@ export function useHook() {
     dataList,
     pagination,
     defaultSort,
-    dateRange,
     multipleSelection,
     onSearch,
     onSortChanged,
@@ -268,6 +302,9 @@ export function useHook() {
     handleDelete,
     handleBulkDelete,
     hasSelectDate,
-    pocList
+    pocList,
+    userList,
+    deptTreeList,
+    onWatch
   };
 }
