@@ -8,6 +8,7 @@ export interface WorkTimeListCommand extends BasePageQuery {
   userId?: number;
   beginDate?: string;
   endDate?: string;
+  week?: number;
 }
 
 export interface WorkTimePageResponse {
@@ -23,6 +24,7 @@ export interface WorkTimePageResponse {
   workContent?: string;
   beginDate?: Date;
   endDate?: Date;
+  week?: number;
 }
 
 export function getWorkTimeListApi(params: WorkTimeListCommand) {
@@ -51,6 +53,7 @@ export interface AddWorkTimeCommand {
   workContent?: string;
   beginDate?: Date;
   endDate?: Date;
+  week?: number;
 }
 
 export const addWorkTimeApi = (data: AddWorkTimeCommand) => {

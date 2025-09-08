@@ -72,6 +72,16 @@ export function getPocListApi(params: PocListCommand) {
   );
 }
 
+export function getPocListAllApi(params: PocListCommand) {
+  return http.request<ResponseData<Array<PocPageResponse>>>(
+    "get",
+    "/poc/listAll",
+    {
+      params
+    }
+  );
+}
+
 export const exportPocExcelApi = (params: PocListCommand, fileName: string) => {
   return http.download("/poc/excel", fileName, {
     params
