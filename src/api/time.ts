@@ -2,8 +2,6 @@ import { http } from "@/utils/http";
 
 export interface WorkTimeListCommand extends BasePageQuery {
   pocId?: number;
-  customer?: string;
-  project?: string;
   deptId?: number;
   userId?: number;
   beginDate?: string;
@@ -22,8 +20,8 @@ export interface WorkTimePageResponse {
   nickname?: string;
   workHours?: number;
   workContent?: string;
-  beginDate?: Date;
-  endDate?: Date;
+  beginDate?: string;
+  endDate?: string;
   week?: number;
 }
 
@@ -51,8 +49,8 @@ export interface AddWorkTimeCommand {
   userId?: number;
   workHours?: number;
   workContent?: string;
-  beginDate?: Date;
-  endDate?: Date;
+  beginDate?: string;
+  endDate?: string;
   week?: number;
 }
 
@@ -70,11 +68,8 @@ export const deleteWorkTimeApi = (workTimeId: number) => {
   return http.request<ResponseData<void>>("delete", `/time/${workTimeId}`);
 };
 
-export const updateWorkTimeApi = (
-  workTimeId: number,
-  data?: UpdateWorkTimeCommand
-) => {
-  return http.request<ResponseData<void>>("put", `/time/${workTimeId}`, {
+export const updateWorkTimeApi = (data?: UpdateWorkTimeCommand) => {
+  return http.request<ResponseData<void>>("put", `/time`, {
     data
   });
 };

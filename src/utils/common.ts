@@ -3,6 +3,8 @@ import { Sort } from "element-plus";
 import { utils, writeFile } from "xlsx";
 import { message } from "./message";
 import { pinyin } from "pinyin-pro";
+import { h } from "vue";
+import dayjs from "dayjs";
 
 export class CommonUtils {
   static getBeginTimeSafely(timeRange: string[]): string {
@@ -135,6 +137,86 @@ export class CommonUtils {
     const pinyinStr = pinyin(chineseStr, { toneType: "none" });
     return pinyinStr.replace(/\s/g, "");
   }
+
+  static truncateRenderer(scope) {
+    // 获取当前单元格的原始值
+    const cellValue = scope.row[scope.column.property] || ""; // 或使用 scope.row[prop]
+    // 截取前10个字符
+    const truncatedText =
+      cellValue.length > 10 ? cellValue.substring(0, 10) + "..." : cellValue;
+
+    // 返回一个带有样式（可选）的HTML字符串
+    //return `<span title="${cellValue}" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${truncatedText}</span>`;
+    //return `${truncatedText}`;
+
+    return h(
+      "span",
+      {
+        style:
+          "display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;",
+        title: cellValue // 鼠标悬停提示完整内容
+        // 可以添加类名、事件等
+        //class: 'truncated-text'
+      },
+      truncatedText // 作为文本子节点
+    );
+  }
+
+  static getWeekNumber = date => {
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const dateTimeStamp = date.getTime();
+    const yearStartTimeStamp = startOfYear.getTime();
+    const diff = dateTimeStamp - yearStartTimeStamp;
+    const daysSinceStartOfYear = diff / (1000 * 60 * 60 * 24);
+    const weeks = Math.floor(daysSinceStartOfYear / 7);
+    return weeks + 1;
+  };
+
+  static getCurrentTime = (data, num) => {
+    const date = new Date(data);
+    const Y = date.getFullYear();
+    const M = date.getMonth();
+    const D = date.getDate() + num;
+    //return Y + '-'+ M + "-" + D;
+    //return new Date(Y, M, D);
+    return dayjs(new Date(Y, M, D)).format("YYYY-MM-DD");
+  };
+
+  static getNewBeginDate = () => {
+    const date = new Date();
+    const y = date.getFullYear();
+    const m = date.getMonth();
+
+    const d = date.getDate();
+    const week = date.getDay();
+    const start = new Date(y, m, d - week + 1);
+
+    return this.getCurrentTime(start, 0);
+  };
+
+  static getNewEndDate = () => {
+    const date = new Date();
+    const y = date.getFullYear();
+    const m = date.getMonth();
+
+    const d = date.getDate();
+    const week = date.getDay();
+    const end = new Date(y, m, d - week + 7);
+
+    return this.getCurrentTime(end, 0);
+  };
+
+  static getNewWeek = () => {
+    const date = new Date();
+    const y = date.getFullYear();
+    const m = date.getMonth();
+
+    const d = date.getDate();
+    const week = date.getDay();
+    const end = new Date(y, m, d - week + 7);
+
+    return this.getWeekNumber(end);
+  };
 
   // 私有构造函数，防止类被实例化
   private constructor() {}

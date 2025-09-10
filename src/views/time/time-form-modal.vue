@@ -1,131 +1,127 @@
 <script setup lang="ts">
-import VDialog from "@/components/VDialog/VDialog.vue";
-import { computed, reactive, ref } from "vue";
-import {
-  AddPostCommand,
-  PostPageResponse,
-  UpdatePostCommand,
-  addPostApi,
-  updatePostApi
-} from "@/api/system/post";
-import { useUserStoreHook } from "@/store/modules/user";
-import { ElMessage, FormInstance, FormRules } from "element-plus";
+import { ref, watch } from "vue";
+import { formRules } from "./rule";
+import { UpdateWorkTimeCommand } from "@/api/time";
+import { CommonUtils } from "@/utils/common";
 
-interface Props {
-  type: "add" | "update";
-  modelValue: boolean;
-  row?: PostPageResponse;
+interface FormProps {
+  formInline: UpdateWorkTimeCommand;
+  pocsOptions: any[];
 }
 
-const props = defineProps<Props>();
-const emits = defineEmits<{
-  (e: "update:modelValue", v: boolean): void;
-  (e: "success"): void;
-}>();
-
-const visible = computed({
-  get: () => props.modelValue,
-  set(v) {
-    emits("update:modelValue", v);
-  }
+const props = withDefaults(defineProps<FormProps>(), {
+  formInline: () => ({
+    workTimeId: undefined,
+    pocId: undefined,
+    userId: undefined,
+    workHours: undefined,
+    workContent: undefined,
+    beginDate: undefined,
+    endDate: undefined,
+    week: undefined
+  }),
+  pocsOptions: () => []
 });
 
-const formData = reactive<AddPostCommand | UpdatePostCommand>({
-  postId: 0,
-  postCode: "",
-  postName: "",
-  postSort: 1,
-  remark: "",
-  status: ""
-});
+const hasSelectDate = val => {
+  const date = new Date(val);
+  const y = date.getFullYear();
+  const m = date.getMonth();
 
-const statusList = useUserStoreHook().dictionaryMap["common.status"];
+  const d = date.getDate();
+  const week = date.getDay();
+  const start = new Date(y, m, d - week + 1);
+  const end = new Date(y, m, d - week + 7);
 
-const rules: FormRules = {
-  postName: [
-    {
-      required: true,
-      message: "岗位名称不能为空"
-    }
-  ],
-  postCode: [
-    {
-      required: true,
-      message: "岗位编码不能为空"
-    }
-  ],
-  postSort: [
-    {
-      required: true,
-      message: "岗位序号不能为空"
-    }
-  ]
+  newFormInline.value.beginDate = CommonUtils.getCurrentTime(start, 0);
+  newFormInline.value.endDate = CommonUtils.getCurrentTime(end, 0);
+  newFormInline.value.week = CommonUtils.getWeekNumber(end);
 };
-const formRef = ref<FormInstance>();
-function handleOpened() {
-  if (props.row) {
-    Object.assign(formData, props.row);
-  } else {
-    formRef.value?.resetFields();
-  }
+
+const newFormInline = ref(props.formInline);
+const pocsOptions = ref(props.pocsOptions);
+
+const formRuleRef = ref();
+
+function getFormRuleRef() {
+  return formRuleRef.value;
 }
 
-const loading = ref(false);
-async function handleConfirm() {
-  try {
-    loading.value = true;
-    if (props.type === "add") {
-      await addPostApi(formData);
-    } else if (props.type === "update") {
-      await updatePostApi(formData as UpdatePostCommand);
+defineExpose({ getFormRuleRef });
+
+watch(
+  [() => newFormInline.value.beginDate, () => newFormInline.value.endDate],
+  () => {
+    if (newFormInline.value.beginDate == "1969-12-29") {
+      newFormInline.value.beginDate = "";
     }
-    ElMessage.info("提交成功");
-    visible.value = false;
-    emits("success");
-  } catch (e) {
-    console.error(e);
-    ElMessage.error((e as Error)?.message || "提交失败");
-  } finally {
-    loading.value = false;
+    if (newFormInline.value.endDate == "1970-01-04") {
+      newFormInline.value.endDate = "";
+    }
   }
-}
+);
 </script>
 
 <template>
-  <v-dialog
-    show-full-screen
-    :fixed-body-height="false"
-    use-body-scrolling
-    :title="type === 'add' ? '新增岗位' : '更新岗位'"
-    v-model="visible"
-    :loading="loading"
-    @confirm="handleConfirm"
-    @cancel="visible = false"
-    @opened="handleOpened"
+  <el-form
+    ref="formRuleRef"
+    :model="newFormInline"
+    :rules="formRules"
+    label-width="130px"
   >
-    <el-form :model="formData" label-width="120px" :rules="rules" ref="formRef">
-      <el-form-item prop="postName" label="岗位名称" required inline-message>
-        <el-input v-model="formData.postName" />
-      </el-form-item>
-      <el-form-item prop="postCode" label="岗位编码" required>
-        <el-input v-model="formData.postCode" />
-      </el-form-item>
-      <el-form-item prop="postSort" label="岗位顺序" required>
-        <el-input-number :min="1" v-model="formData.postSort" />
-      </el-form-item>
-      <el-form-item prop="status" label="岗位状态">
-        <el-radio-group v-model="formData.status">
-          <el-radio
-            v-for="item in Object.keys(statusList)"
-            :key="item"
-            :label="statusList[item].value"
-            >{{ statusList[item].label }}</el-radio
-          >
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item prop="remark" label="备注" style="margin-bottom: 0">
-        <el-input type="textarea" v-model="formData.remark" />
-      </el-form-item>
-    </el-form>
-  </v-dialog>
+    <el-form-item prop="beginDate" label="周" required>
+      <el-date-picker
+        style="width: 100%"
+        v-model="newFormInline.beginDate"
+        type="week"
+        :format="
+          newFormInline.beginDate +
+          ' 至 ' +
+          newFormInline.endDate +
+          '   (第' +
+          newFormInline.week +
+          '周)'
+        "
+        placeholder="请选择日期"
+        @change="hasSelectDate"
+      />
+    </el-form-item>
+
+    <el-form-item label="项目名称" prop="pocId">
+      <el-select
+        class="w-full"
+        v-model="newFormInline.pocId"
+        placeholder="请选择项目名称"
+        clearable
+        filterable
+      >
+        <el-option
+          v-for="dict in pocsOptions"
+          :key="dict.pocId"
+          :label="dict.project"
+          :value="dict.pocId"
+        />
+      </el-select>
+    </el-form-item>
+
+    <el-form-item label="工时（小时）" prop="workHours">
+      <el-input-number
+        style="width: 100%"
+        :min="0"
+        v-model="newFormInline.workHours"
+        clearable
+        placeholder="请输入工时"
+      />
+    </el-form-item>
+
+    <el-form-item label="工作事项" prop="workContent">
+      <el-input
+        v-model="newFormInline.workContent"
+        clearable
+        placeholder="请输入工作事项"
+        type="textarea"
+        rows="5"
+      />
+    </el-form-item>
+  </el-form>
 </template>

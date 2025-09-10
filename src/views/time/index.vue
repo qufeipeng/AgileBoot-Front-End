@@ -5,14 +5,11 @@ import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
 import Delete from "@iconify-icons/ep/delete";
+import EditPen from "@iconify-icons/ep/edit-pen";
 import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
-// TODO 这个导入声明好长  看看如何优化
-import { CommonUtils } from "@/utils/common";
-import TimeFormModal from "@/views/time/time-form-modal.vue";
-import EditPen from "@iconify-icons/ep/edit-pen";
-import { WorkTimePageResponse } from "@/api/time";
 import AddFill from "@iconify-icons/ri/add-circle-line";
+import { CommonUtils } from "@/utils/common";
 
 /** 组件name最好和菜单表中的router_name一致 */
 defineOptions({
@@ -29,34 +26,25 @@ const {
   dataList,
   pagination,
   defaultSort,
-  multipleSelection,
   onSearch,
   resetForm,
   onSortChanged,
   exportAllExcel,
   getWorkTimeList,
   handleDelete,
-  handleBulkDelete,
-  hasSelectDate,
+  openDialog,
   pocList,
   userList,
   deptTreeList,
+  hasSelectDate,
   onWatch
 } = useHook();
-
-const value1 = ref("");
-const opType = ref<"add" | "update">("add");
-const modalVisible = ref(false);
-const opRow = ref<WorkTimePageResponse>();
-function openDialog(type: "add" | "update", row?: WorkTimePageResponse) {
-  opType.value = type;
-  opRow.value = row;
-  modalVisible.value = true;
-}
 
 watch(
   [
     () => searchFormParams.pocId,
+    () => searchFormParams.deptId,
+    () => searchFormParams.userId,
     () => searchFormParams.beginDate,
     () => searchFormParams.endDate
   ],
@@ -64,6 +52,7 @@ watch(
     onWatch();
   }
 );
+const value1 = ref("");
 </script>
 
 <template>
@@ -166,16 +155,9 @@ watch(
         <el-button
           type="primary"
           :icon="useRenderIcon(AddFill)"
-          @click="openDialog('add')"
+          @click="openDialog('新增')"
         >
           新增工时
-        </el-button>
-        <el-button
-          type="danger"
-          :icon="useRenderIcon(Delete)"
-          @click="handleBulkDelete(tableRef)"
-        >
-          批量删除
         </el-button>
         <el-button
           type="primary"
@@ -206,9 +188,6 @@ watch(
           @page-size-change="getWorkTimeList"
           @page-current-change="getWorkTimeList"
           @sort-change="onSortChanged"
-          @selection-change="
-            rows => (multipleSelection = rows.map(item => item.workTimeId))
-          "
         >
           <template #operation="{ row }">
             <el-button
@@ -216,8 +195,8 @@ watch(
               link
               type="primary"
               :size="size"
+              @click="openDialog('编辑', row)"
               :icon="useRenderIcon(EditPen)"
-              @click="openDialog('update', row)"
             >
               编辑
             </el-button>
@@ -241,13 +220,6 @@ watch(
         </pure-table>
       </template>
     </PureTableBar>
-
-    <time-form-modal
-      v-model="modalVisible"
-      :type="opType"
-      :row="opRow"
-      @success="onSearch"
-    />
   </div>
 </template>
 

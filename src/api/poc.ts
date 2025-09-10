@@ -139,8 +139,8 @@ export const deletePocApi = (pocId: number) => {
   return http.request<ResponseData<void>>("delete", `/poc/${pocId}`);
 };
 
-export const updatePocApi = (pocId: number, data?: UpdatePocCommand) => {
-  return http.request<ResponseData<void>>("put", `/poc/${pocId}`, {
+export const updatePocApi = (data?: UpdatePocCommand) => {
+  return http.request<ResponseData<void>>("put", `/poc`, {
     data
   });
 };

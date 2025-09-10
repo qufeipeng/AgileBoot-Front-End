@@ -196,13 +196,13 @@ export function useHook() {
       label: "待处理&风险描述",
       prop: "todoRisk",
       minWidth: 100,
-      cellRenderer: truncateRenderer
+      cellRenderer: CommonUtils.truncateRenderer
     },
     {
       label: "已完成进展",
       prop: "done",
       minWidth: 100,
-      cellRenderer: truncateRenderer
+      cellRenderer: CommonUtils.truncateRenderer
     },
     {
       label: "销售",
@@ -315,7 +315,7 @@ export function useHook() {
       label: "备注",
       prop: "notes",
       minWidth: 100,
-      cellRenderer: truncateRenderer
+      cellRenderer: CommonUtils.truncateRenderer
     },
     {
       label: "创建者",
@@ -350,30 +350,6 @@ export function useHook() {
       slot: "operation"
     }
   ];
-
-  function truncateRenderer(scope) {
-    // 获取当前单元格的原始值
-    const cellValue = scope.row[scope.column.property] || ""; // 或使用 scope.row[prop]
-    // 截取前10个字符
-    const truncatedText =
-      cellValue.length > 10 ? cellValue.substring(0, 10) + "..." : cellValue;
-
-    // 返回一个带有样式（可选）的HTML字符串
-    //return `<span title="${cellValue}" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${truncatedText}</span>`;
-    //return `${truncatedText}`;
-
-    return h(
-      "span",
-      {
-        style:
-          "display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;",
-        title: cellValue // 鼠标悬停提示完整内容
-        // 可以添加类名、事件等
-        //class: 'truncated-text'
-      },
-      truncatedText // 作为文本子节点
-    );
-  }
 
   async function exportAllExcel() {
     //CommonUtils.fillPaginationParams(searchFormParams, pagination);
@@ -410,7 +386,7 @@ export function useHook() {
   async function handleUpdate(row, done) {
     row.plugins = row.plugins.join(",");
     row.deployment = row.deployment.join(",");
-    await updatePocApi(row.pocId, row as UpdatePocCommand).then(() => {
+    await updatePocApi(row as UpdatePocCommand).then(() => {
       message(`您修改了POC${row.project} 的这条数据`, {
         type: "success"
       });
