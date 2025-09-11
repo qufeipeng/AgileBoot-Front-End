@@ -5,5 +5,8 @@ import type { FormRules } from "element-plus";
 export const formRules = reactive(<FormRules>{
   beginDate: [{ required: true, message: "周为必填项", trigger: "change" }],
   pocId: [{ required: true, message: "项目名称为必填项", trigger: "change" }],
-  workHours: [{ required: true, message: "工时为必填项", trigger: "change" }]
+  workHours: [{ required: true, message: "工时为必填项", trigger: "change" }],
+  workContent: [
+    { required: true, message: "工作事项为必填项", trigger: "blur" }
+  ]
 });

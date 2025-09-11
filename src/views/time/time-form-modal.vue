@@ -107,7 +107,7 @@ watch(
     <el-form-item label="工时（小时）" prop="workHours">
       <el-input-number
         style="width: 100%"
-        :min="0"
+        :min="0.5"
         v-model="newFormInline.workHours"
         clearable
         placeholder="请输入工时"

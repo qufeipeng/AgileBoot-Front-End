@@ -37,6 +37,7 @@ const {
   userList,
   deptTreeList,
   hasSelectDate,
+  getSummaries,
   onWatch
 } = useHook();
 
@@ -188,6 +189,8 @@ const value1 = ref("");
           @page-size-change="getWorkTimeList"
           @page-current-change="getWorkTimeList"
           @sort-change="onSortChanged"
+          :summary-method="getSummaries"
+          show-summary
         >
           <template #operation="{ row }">
             <el-button

@@ -16,7 +16,8 @@ import {
   exportWorkTimeExcelApi,
   addWorkTimeApi,
   updateWorkTimeApi,
-  deleteWorkTimeApi
+  deleteWorkTimeApi,
+  WorkTimePageResponse
 } from "@/api/time";
 import { getPocListAllApi } from "@/api/poc";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -148,6 +149,37 @@ export function useHook() {
     }
   ];
 
+  interface SummaryMethodProps<T = WorkTimePageResponse> {
+    columns: any[];
+    data: T[];
+  }
+
+  const getSummaries = (param: SummaryMethodProps) => {
+    const { columns, data } = param;
+    const sums: string[] = [];
+    columns.forEach((column, index) => {
+      if (index === 0) {
+        sums[index] = "工时合计";
+        return;
+      }
+      const values = data.map(item => Number(item[column.property]));
+      if (index === 9 && !values.every(value => Number.isNaN(value))) {
+        sums[index] = `${values.reduce((prev, curr) => {
+          const value = Number(curr);
+          if (!Number.isNaN(value)) {
+            return prev + curr;
+          } else {
+            return prev;
+          }
+        }, 0)}`;
+      } else {
+        sums[index] = "";
+      }
+    });
+
+    return sums;
+  };
+
   const hasSelectDate = val => {
     const date = new Date(val);
     const y = date.getFullYear();
@@ -177,7 +209,7 @@ export function useHook() {
 
   async function handleAdd(row, done) {
     await addWorkTimeApi(row as UpdateWorkTimeCommand).then(() => {
-      message(`您新增了工时${row.project} 的这条数据`, {
+      message(`您新增了一条工时数据`, {
         type: "success"
       });
       // 关闭弹框
@@ -200,7 +232,7 @@ export function useHook() {
   }
 
   async function handleDelete(row) {
-    await deleteWorkTimeApi(row.pocId).then(() => {
+    await deleteWorkTimeApi(row.workTimeId).then(() => {
       message(`您删除了工时${row.workTimeId} 的这条数据`, { type: "success" });
       // 刷新列表
       getWorkTimeList();
@@ -335,6 +367,7 @@ export function useHook() {
     userList,
     deptTreeList,
     hasSelectDate,
+    getSummaries,
     onWatch
   };
 }
