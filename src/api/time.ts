@@ -2,6 +2,7 @@ import { http } from "@/utils/http";
 
 export interface WorkTimeListCommand extends BasePageQuery {
   pocId?: number;
+  customer?: string;
   deptId?: number;
   userId?: number;
   beginDate?: string;

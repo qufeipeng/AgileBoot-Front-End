@@ -19,7 +19,7 @@ import {
   deleteWorkTimeApi,
   WorkTimePageResponse
 } from "@/api/time";
-import { getPocListAllApi } from "@/api/poc";
+import { getPocListAllApi, getCustomerListAllApi } from "@/api/poc";
 import { useUserStoreHook } from "@/store/modules/user";
 
 export function useHook() {
@@ -31,6 +31,7 @@ export function useHook() {
 
   const searchFormParams = reactive<WorkTimeListCommand>({
     pocId: undefined,
+    customer: undefined,
     //beginDate: dayjs().format("YYYY-MM-DD"),
     //endDate: dayjs().format("YYYY-MM-DD"),
     beginDate: undefined,
@@ -56,6 +57,8 @@ export function useHook() {
   const deptTreeList = ref([]);
 
   const userList = ref([]);
+
+  const customerList = ref([]);
 
   const columns: TableColumnList = [
     // {
@@ -346,6 +349,9 @@ export function useHook() {
 
     const userListNoPageResponse = await getUserListNoPageApi({});
     userList.value = userListNoPageResponse.data;
+
+    const customerListResponse = await getCustomerListAllApi();
+    customerList.value = customerListResponse.data;
   });
 
   return {
@@ -368,6 +374,7 @@ export function useHook() {
     deptTreeList,
     hasSelectDate,
     getSummaries,
+    customerList,
     onWatch
   };
 }

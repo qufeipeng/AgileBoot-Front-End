@@ -42,6 +42,7 @@ const {
   userListAll,
   deptTreeList,
   pocList,
+  customerList,
   onWatch
 } = useHook();
 
@@ -85,13 +86,29 @@ watch(
           class="!w-[200px]"
         />
       </el-form-item> -->
-      <el-form-item label="客户" prop="customer">
+      <!-- <el-form-item label="客户" prop="customer">
         <el-input
           v-model="searchFormParams.customer"
           placeholder="请输入客户"
           clearable
           class="!w-[200px]"
         />
+      </el-form-item> -->
+      <el-form-item label="客户名称" prop="customer">
+        <el-select
+          v-model="searchFormParams.customer"
+          placeholder="请选择客户名称"
+          clearable
+          filterable
+          class="!w-[200px]"
+        >
+          <el-option
+            v-for="customer in customerList"
+            :key="customer"
+            :label="customer"
+            :value="customer"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="项目名称" prop="project">
         <el-select

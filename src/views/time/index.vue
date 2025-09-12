@@ -38,12 +38,14 @@ const {
   deptTreeList,
   hasSelectDate,
   getSummaries,
+  customerList,
   onWatch
 } = useHook();
 
 watch(
   [
     () => searchFormParams.pocId,
+    () => searchFormParams.customer,
     () => searchFormParams.deptId,
     () => searchFormParams.userId,
     () => searchFormParams.beginDate,
@@ -81,6 +83,22 @@ const value1 = ref("");
           placeholder="请选择日期"
           @change="hasSelectDate"
         />
+      </el-form-item>
+      <el-form-item label="客户名称" prop="customer">
+        <el-select
+          v-model="searchFormParams.customer"
+          placeholder="请选择客户名称"
+          clearable
+          filterable
+          class="!w-[200px]"
+        >
+          <el-option
+            v-for="customer in customerList"
+            :key="customer"
+            :label="customer"
+            :value="customer"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="项目名称" prop="pocId">
         <el-select

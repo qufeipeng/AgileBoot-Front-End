@@ -18,7 +18,8 @@ import {
   addPocApi,
   updatePocApi,
   UpdatePocCommand,
-  getPocListNoPageApi
+  getPocListNoPageApi,
+  getCustomerListApi
 } from "@/api/poc";
 import { useUserStoreHook } from "@/store/modules/user";
 
@@ -140,6 +141,8 @@ export function useHook() {
   const provinces = ref([]);
 
   const plugins = ref([]);
+
+  const customerList = ref([]);
 
   //const isDisabled = ref(false);
   //isDisabled.value = useUserStoreHook().roles[0] != "admin";
@@ -568,6 +571,9 @@ export function useHook() {
 
     const pluginsResponse = await getDictListApi("plugins");
     plugins.value = pluginsResponse.data;
+
+    const customerListResponse = await getCustomerListApi({});
+    customerList.value = customerListResponse.data;
   });
 
   return {
@@ -594,6 +600,7 @@ export function useHook() {
     userListAll,
     deptTreeList,
     pocList,
+    customerList,
     onWatch
   };
 }

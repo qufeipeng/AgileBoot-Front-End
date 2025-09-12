@@ -98,7 +98,7 @@ watch(
         <el-option
           v-for="dict in pocsOptions"
           :key="dict.pocId"
-          :label="dict.project"
+          :label="dict.customer + ' - ' + dict.project"
           :value="dict.pocId"
         />
       </el-select>
