@@ -196,6 +196,12 @@ export function useHook() {
       // cellRenderer: ({ row }) => risks[row.risk]?.label ?? ""
     },
     {
+      label: "总体计划",
+      prop: "plan",
+      minWidth: 100,
+      cellRenderer: CommonUtils.truncateRenderer
+    },
+    {
       label: "待处理&风险描述",
       prop: "todoRisk",
       minWidth: 100,
@@ -323,12 +329,6 @@ export function useHook() {
     {
       label: "客户评价",
       prop: "evaluate",
-      minWidth: 100,
-      cellRenderer: CommonUtils.truncateRenderer
-    },
-    {
-      label: "总体计划",
-      prop: "plan",
       minWidth: 100,
       cellRenderer: CommonUtils.truncateRenderer
     },
