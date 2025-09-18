@@ -47,8 +47,9 @@ const props = withDefaults(defineProps<FormProps>(), {
     deployment: "",
     compatibility: "",
     plugins: "",
-    notes: ""
-    //deptId: 0
+    notes: "",
+    evaluate: "",
+    plan: ""
   }),
   //deptOptions: () => [],
   statusOptions: () => [],
@@ -92,7 +93,7 @@ defineExpose({ getFormRuleRef });
     label-width="130px"
   >
     <el-row :gutter="20">
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="当前责任人" prop="owner">
           <el-select
             class="w-full"
@@ -111,7 +112,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <!-- <re-col :value="8">
+      <!-- <re-col :value="6">
         <el-form-item label="当前责任人" prop="owner">
           <el-tree-select
             class="w-full"
@@ -132,7 +133,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col> -->
 
-      <!-- <re-col :value="8">
+      <!-- <re-col :value="6">
         <el-form-item label="项目组">
           <el-tree-select
             class="w-full"
@@ -153,7 +154,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col> -->
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="客户" prop="customer">
           <el-input
             v-model="newFormInline.customer"
@@ -163,7 +164,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="项目名称" prop="project">
           <el-input
             v-model="newFormInline.project"
@@ -173,7 +174,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="进度" prop="progress">
           <el-input-number
             style="width: 100%"
@@ -185,7 +186,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="状态" prop="status">
           <el-select
             class="w-full"
@@ -203,7 +204,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="风险" prop="risk">
           <el-select
             class="w-full"
@@ -221,7 +222,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="销售" prop="sales">
           <el-input
             v-model="newFormInline.sales"
@@ -231,7 +232,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="售前" prop="sa">
           <el-select
             class="w-full"
@@ -250,7 +251,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="POC人员" prop="poc">
           <el-select
             class="w-full"
@@ -269,7 +270,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <!-- <re-col :value="8">
+      <!-- <re-col :value="6">
         <el-form-item label="POC人员" prop="poc">
           <el-tree-select
             class="w-full"
@@ -290,7 +291,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col> -->
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="运维" prop="op">
           <el-input
             v-model="newFormInline.op"
@@ -300,7 +301,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="重点项目" prop="kv">
           <el-input
             v-model="newFormInline.kv"
@@ -310,7 +311,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="开始日期" prop="pocStartDt">
           <el-date-picker
             style="width: 100%"
@@ -322,7 +323,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="完成日期" prop="pocEndDt">
           <el-date-picker
             style="width: 100%"
@@ -334,7 +335,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="上线日期" prop="onlineDt">
           <el-date-picker
             style="width: 100%"
@@ -346,7 +347,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="最后更新日期" prop="lastUpdDt">
           <el-date-picker
             style="width: 100%"
@@ -358,7 +359,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="省份" prop="province">
           <el-select
             class="w-full"
@@ -376,7 +377,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="行业" prop="industry">
           <el-select
             class="w-full"
@@ -394,7 +395,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="ISV" prop="isv">
           <el-input
             v-model="newFormInline.isv"
@@ -404,7 +405,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="运维厂商" prop="maintenance">
           <el-input
             v-model="newFormInline.maintenance"
@@ -414,7 +415,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
+      <re-col :value="6">
         <el-form-item label="版本号" prop="version">
           <el-input
             v-model="newFormInline.version"
@@ -424,7 +425,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <!-- <re-col :value="8">
+      <!-- <re-col :value="6">
         <el-form-item label="部署形态" prop="deployment">
           <el-select
             class="w-full"
@@ -440,7 +441,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col> -->
 
-      <!-- <re-col :value="8">
+      <!-- <re-col :value="6">
         <el-form-item label="部署形态" prop="deployment">
           <el-select
             class="w-full"
@@ -458,7 +459,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col> -->
 
-      <re-col :value="8">
+      <re-col :value="12">
         <el-form-item label="部署形态" prop="deployment">
           <el-select
             class="w-full"
@@ -477,42 +478,7 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <!-- <re-col :value="8">
-        <el-form-item label="兼容性需求" prop="compatibility">
-          <el-select
-            class="w-full"
-            v-model="newFormInline.compatibility"
-            placeholder="请选择兼容性需求"
-            clearable
-          >
-            <el-option label="Oracle" value="0"> </el-option>
-            <el-option label="MySQL" value="1"> </el-option>
-            <el-option label="PG" value="2"> </el-option>
-            <el-option label="DB2" value="3"> </el-option>
-            <el-option label="DM" value="4"> </el-option>
-          </el-select>
-        </el-form-item>
-      </re-col> -->
-
-      <re-col :value="8">
-        <el-form-item label="兼容性需求" prop="compatibility">
-          <el-select
-            class="w-full"
-            v-model="newFormInline.compatibility"
-            placeholder="请选择兼容性需求"
-            clearable
-          >
-            <el-option
-              v-for="item in compatibilityOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-      </re-col>
-
-      <re-col :value="8">
+      <re-col :value="12">
         <el-form-item label="相关组件" prop="plugins">
           <el-select
             class="w-full"
@@ -531,25 +497,72 @@ defineExpose({ getFormRuleRef });
         </el-form-item>
       </re-col>
 
-      <re-col :value="8">
-        <el-form-item label="备注" prop="notes">
+      <!-- <re-col :value="6">
+        <el-form-item label="兼容性需求" prop="compatibility">
+          <el-select
+            class="w-full"
+            v-model="newFormInline.compatibility"
+            placeholder="请选择兼容性需求"
+            clearable
+          >
+            <el-option label="Oracle" value="0"> </el-option>
+            <el-option label="MySQL" value="1"> </el-option>
+            <el-option label="PG" value="2"> </el-option>
+            <el-option label="DB2" value="3"> </el-option>
+            <el-option label="DM" value="4"> </el-option>
+          </el-select>
+        </el-form-item>
+      </re-col> -->
+
+      <re-col :value="6">
+        <el-form-item label="兼容性需求" prop="compatibility">
+          <el-select
+            class="w-full"
+            v-model="newFormInline.compatibility"
+            placeholder="请选择兼容性需求"
+            clearable
+          >
+            <el-option
+              v-for="item in compatibilityOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+      </re-col>
+
+      <re-col :value="6">
+        <el-form-item label="节点数" prop="notes">
           <el-input
             v-model="newFormInline.notes"
             clearable
-            placeholder="请输入备注内容"
+            placeholder="请输入节点数"
           />
         </el-form-item>
       </re-col>
 
-      <!-- <re-col :value="8">
-        <el-form-item label="相关组件" prop="plugins">
+      <re-col :value="12">
+        <el-form-item label="客户评价" prop="evaluate">
           <el-input
-            v-model="newFormInline.plugins"
+            v-model="newFormInline.evaluate"
             clearable
-            placeholder="请输入相关组件"
+            placeholder="请输入客户评价"
           />
         </el-form-item>
-      </re-col> -->
+      </re-col>
+
+      <re-col :value="24">
+        <el-form-item label="总体计划" prop="plan">
+          <el-input
+            v-model="newFormInline.plan"
+            clearable
+            placeholder="请输入总体计划"
+            type="textarea"
+            rows="4"
+          />
+        </el-form-item>
+      </re-col>
 
       <re-col :value="24">
         <el-form-item label="待处理&风险描述" prop="todoRisk">
@@ -558,7 +571,7 @@ defineExpose({ getFormRuleRef });
             clearable
             placeholder="请输入待处理&风险描述"
             type="textarea"
-            rows="5"
+            rows="4"
           />
         </el-form-item>
       </re-col>
@@ -570,7 +583,7 @@ defineExpose({ getFormRuleRef });
             clearable
             placeholder="请输入进展"
             type="textarea"
-            rows="5"
+            rows="4"
           />
         </el-form-item>
       </re-col>

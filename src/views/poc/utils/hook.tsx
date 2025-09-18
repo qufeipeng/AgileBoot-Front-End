@@ -315,8 +315,20 @@ export function useHook() {
       minWidth: 100
     },
     {
-      label: "备注",
+      label: "节点数",
       prop: "notes",
+      minWidth: 100,
+      cellRenderer: CommonUtils.truncateRenderer
+    },
+    {
+      label: "客户评价",
+      prop: "evaluate",
+      minWidth: 100,
+      cellRenderer: CommonUtils.truncateRenderer
+    },
+    {
+      label: "总体计划",
+      prop: "plan",
       minWidth: 100,
       cellRenderer: CommonUtils.truncateRenderer
     },
@@ -461,8 +473,9 @@ export function useHook() {
           deployment: row?.deployment?.split(",") ?? "",
           compatibility: row?.compatibility ?? "",
           plugins: row?.plugins?.split(",") ?? "",
-          notes: row?.notes ?? ""
-          //deptId: row?.deptId ?? useUserStoreHook().deptId
+          notes: row?.notes ?? "",
+          evaluate: row?.evaluate ?? "",
+          plan: row?.plan ?? ""
         },
         //deptOptions: deptTreeList,
         statusOptions: status,
@@ -478,7 +491,7 @@ export function useHook() {
         //isDisabled: isDisabled
       },
 
-      width: "70%",
+      width: "85%",
       draggable: true,
       fullscreenIcon: true,
       closeOnClickModal: false,

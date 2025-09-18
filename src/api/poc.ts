@@ -56,6 +56,8 @@ export interface PocPageResponse {
   notes: string;
   deptId: number;
   deptName: string;
+  evaluate: string;
+  plan: string;
   creatorName: string;
   createTime: Date;
   updaterName: string;
@@ -135,7 +137,8 @@ export interface AddPocCommand {
   compatibility: string;
   plugins: string;
   notes: string;
-  //deptId: number;
+  evaluate: string;
+  plan: string;
 }
 
 export const addPocApi = (data: AddPocCommand) => {
